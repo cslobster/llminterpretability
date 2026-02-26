@@ -44,3 +44,17 @@ All outputs are saved to `./artifacts/` (or the path given by `--output_dir`):
 | `direction_metadata.json` | The selected layer index and token position |
 | `candidate_directions.pt` | All candidate directions (shape `[5, 28, 3072]`) |
 | `all_direction_scores.json` | Scores for every candidate (KL, ablation, steering) |
+
+## Results
+
+Run on a MacBook Pro with 32 GB memory (Apple Silicon, MPS backend).
+
+Best direction found at **position=-1, layer=14** (out of 28 layers):
+
+| Metric | With direction | Baseline |
+|--------|---------------|----------|
+| Ablation refusal score (harmful prompts) | -11.71 | 7.71 |
+| Steering refusal score (harmless prompts) | 7.14 | -14.37 |
+| KL divergence (harmless) | 0.079 | — |
+
+Ablating this single direction from all layers flips the model from refusing harmful prompts (score +7.71) to complying (score -11.71). Conversely, adding the direction to harmless prompts induces refusal (score jumps from -14.37 to +7.14). The low KL divergence (0.079) confirms the intervention is surgical and does not degrade general model capabilities.

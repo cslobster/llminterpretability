@@ -31,6 +31,9 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+# MPS doesn't support float64; use float32 on Apple Silicon, float64 elsewhere
+DTYPE_HIGH = torch.float32 if torch.backends.mps.is_available() else DTYPE_HIGH
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────────────────────────────────────
@@ -88,7 +91,7 @@ def sample_instructions(datasets: dict, seed: int = 42) -> tuple[list[str], list
 def load_model_and_tokenizer(model_id: str = MODEL_ID, dtype=torch.bfloat16):
     print(f"Loading model {model_id} ...")
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, torch_dtype=dtype, device_map="auto",
+        model_id, dtype=dtype, device_map="auto",
     ).eval()
     model.requires_grad_(False)
 
@@ -197,7 +200,7 @@ def compute_refusal_scores(
     """
     fwd_pre_hooks = fwd_pre_hooks or []
     fwd_hooks = fwd_hooks or []
-    scores = torch.zeros(len(instructions), dtype=torch.float64)  # CPU — MPS lacks float64
+    scores = torch.zeros(len(instructions), device=model.device, dtype=DTYPE_HIGH)
 
     for i in range(0, len(instructions), batch_size):
         batch = instructions[i : i + batch_size]
@@ -208,9 +211,9 @@ def compute_refusal_scores(
                 attention_mask=tok.attention_mask.to(model.device),
             ).logits
 
-        # last-position logits → refusal probability (compute on CPU for float64)
-        last_logits = logits[:, -1, :].float().cpu()
-        probs = F.softmax(last_logits, dim=-1).to(torch.float64)
+        # last-position logits → refusal probability
+        last_logits = logits[:, -1, :].to(DTYPE_HIGH)
+        probs = F.softmax(last_logits, dim=-1)
         refusal_probs = probs[:, refusal_toks].sum(dim=-1)
         nonrefusal_probs = 1.0 - refusal_probs
         eps = 1e-8
@@ -237,7 +240,7 @@ def get_last_position_logits(
                 input_ids=tok.input_ids.to(model.device),
                 attention_mask=tok.attention_mask.to(model.device),
             ).logits
-        all_logits.append(logits[:, -1, :].cpu())
+        all_logits.append(logits[:, -1, :])
 
     return torch.cat(all_logits, dim=0)
 
@@ -272,8 +275,8 @@ def filter_by_refusal_scores(
 def _mean_activation_pre_hook(layer_idx, cache, n_samples, positions):
     """Pre-hook that accumulates the mean activation at given positions."""
     def hook_fn(module, inp):
-        activation = inp[0][:, positions, :].float().cpu().to(torch.float64)
-        cache[:, layer_idx] += (1.0 / n_samples) * activation.sum(dim=0)
+        activation = inp[0].clone().to(cache)              # (batch, seq, d_model)
+        cache[:, layer_idx] += (1.0 / n_samples) * activation[:, positions, :].sum(dim=0)
     return hook_fn
 
 
@@ -294,7 +297,7 @@ def get_mean_activations(
     layers = model.model.layers
 
     mean_acts = torch.zeros(
-        (n_positions, n_layers, d_model), dtype=torch.float64  # CPU — MPS lacks float64
+        (n_positions, n_layers, d_model), dtype=DTYPE_HIGH, device=model.device
     )
 
     fwd_pre_hooks = [
@@ -344,8 +347,8 @@ def generate_candidate_directions(
 
 def kl_divergence(logits_a: torch.Tensor, logits_b: torch.Tensor) -> torch.Tensor:
     """Per-sample KL(softmax(a) || softmax(b)), averaged over positions."""
-    a = logits_a.cpu().to(torch.float64)
-    b = logits_b.cpu().to(torch.float64)
+    a = logits_a.to(DTYPE_HIGH)
+    b = logits_b.to(DTYPE_HIGH)
     p = F.softmax(a, dim=-1)
     q = F.softmax(b, dim=-1)
     eps = 1e-6
@@ -395,9 +398,9 @@ def select_best_direction(
         model, tokenizer, harmless_val, batch_size=batch_size,
     )
 
-    ablation_refusal = torch.zeros((n_pos, n_layers), dtype=torch.float64)  # CPU
-    steering_refusal = torch.zeros((n_pos, n_layers), dtype=torch.float64)
-    kl_scores = torch.zeros((n_pos, n_layers), dtype=torch.float64)
+    ablation_refusal = torch.zeros((n_pos, n_layers), device=model.device, dtype=DTYPE_HIGH)
+    steering_refusal = torch.zeros((n_pos, n_layers), device=model.device, dtype=DTYPE_HIGH)
+    kl_scores = torch.zeros((n_pos, n_layers), device=model.device, dtype=DTYPE_HIGH)
 
     # --- KL divergence for each candidate (ablation on harmless) ---
     for pos in range(-n_pos, 0):
