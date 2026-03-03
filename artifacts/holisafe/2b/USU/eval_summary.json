@@ -1,0 +1,12 @@
+{
+  "position": -3,
+  "position_index": 0,
+  "layer": 9,
+  "baseline_harmful_refusal": -9.748655319213867,
+  "baseline_harmless_refusal": -11.864060401916504,
+  "ablation_refusal": -10.206938743591309,
+  "steering_refusal": -8.779937744140625,
+  "kl_divergence": 0.09221730381250381,
+  "ablation_delta": -0.4582834243774414,
+  "steering_delta": 3.084122657775879
+}
