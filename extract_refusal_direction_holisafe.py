@@ -9,7 +9,12 @@
 # ]
 # ///
 """
-Extract refusal directions from PaliGemma (3B / 10B) using HoliSafe-Bench.
+Extract refusal directions from VLMs using HoliSafe-Bench.
+
+Supported models:
+  - PaliGemma 3B (google/paligemma-3b-pt-224)
+  - PaliGemma 2 10B (google/paligemma2-10b-pt-224)
+  - LLaVA 1.5 7B (llava-hf/llava-1.5-7b-hf)
 
 Uses the HoliSafe-Bench dataset (etri-vilab/holisafe-bench) which classifies
 multimodal inputs into 5 risk types:
@@ -39,6 +44,9 @@ Usage:
     # PaliGemma 2 10B
     uv run extract_refusal_direction_holisafe.py --model 10b
 
+    # LLaVA 1.5 7B
+    uv run extract_refusal_direction_holisafe.py --model llava-7b
+
     # Options
     uv run extract_refusal_direction_holisafe.py --model 3b --batch_size 4 --sanity
 """
@@ -56,7 +64,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from tqdm import tqdm
-from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
+from transformers import AutoModelForVision2Seq, AutoProcessor
 
 # MPS (Apple Silicon) doesn't support float64; use float32 on MPS, float64 elsewhere
 DTYPE_HIGH = torch.float32 if torch.backends.mps.is_available() else torch.float64
@@ -78,18 +86,25 @@ MODEL_CONFIGS = {
     "3b": {
         "model_id": "google/paligemma-3b-pt-224",
         "name": "PaliGemma 3B (Gemma 2B backbone)",
+        "prompt_template": "<image> {question}",
     },
     "10b": {
         "model_id": "google/paligemma2-10b-pt-224",
         "name": "PaliGemma 2 10B (Gemma 2 9B backbone)",
+        "prompt_template": "<image> {question}",
+    },
+    "llava-7b": {
+        "model_id": "llava-hf/llava-1.5-7b-hf",
+        "name": "LLaVA 1.5 7B (Vicuna 7B backbone)",
+        "prompt_template": "USER: <image>\n{question}\nASSISTANT:",
     },
 }
 
 HARMFUL_TYPES = ["USU", "SUU", "UUU", "SSU"]
 HARMLESS_TYPE = "SSS"
 
-# PaliGemma prompt format
-PALIGEMMA_PROMPT_TEMPLATE = " {question}"
+# Prompt template — overridden per-model in main()
+PROMPT_TEMPLATE = "<image> {question}"
 
 # Regex-based refusal detection for generated text
 REFUSAL_PATTERNS = [
@@ -190,17 +205,17 @@ def create_splits(
 
 def load_model_and_processor(model_id: str, dtype=torch.bfloat16):
     print(f"  Loading model {model_id} ...")
-    # MPS + PaliGemma has known hanging issues with device_map="auto" and
+    # MPS (Apple Silicon) has known hanging issues with device_map="auto" and
     # accelerate's init_empty_weights; load directly then move to MPS.
     if torch.backends.mps.is_available():
         print("  MPS detected — loading directly to CPU then moving to MPS")
-        model = PaliGemmaForConditionalGeneration.from_pretrained(
+        model = AutoModelForVision2Seq.from_pretrained(
             model_id, dtype=dtype, low_cpu_mem_usage=False,
         ).eval()
         model = model.to("mps")
         print("  Model moved to MPS successfully")
     else:
-        model = PaliGemmaForConditionalGeneration.from_pretrained(
+        model = AutoModelForVision2Seq.from_pretrained(
             model_id, dtype=dtype, device_map="auto",
         ).eval()
     device = next(model.parameters()).device
@@ -226,7 +241,7 @@ def process_multimodal_batch(processor, samples: list[MultimodalSample], device)
     """Process a batch of multimodal samples into model inputs."""
     images = [s.image for s in samples]
     prompts = [
-        "<image>" + PALIGEMMA_PROMPT_TEMPLATE.format(question=s.question)
+        PROMPT_TEMPLATE.format(question=s.question)
         for s in samples
     ]
     inputs = processor(
@@ -960,8 +975,8 @@ def main():
         description="Extract refusal directions from PaliGemma 2 using HoliSafe-Bench",
     )
     parser.add_argument(
-        "--model", choices=["3b", "10b"], required=True,
-        help="PaliGemma model variant: 3b (PaliGemma 3B) or 10b (PaliGemma 2 10B)",
+        "--model", choices=list(MODEL_CONFIGS.keys()), required=True,
+        help="Model variant: 3b (PaliGemma 3B), 10b (PaliGemma 2 10B), or llava-7b (LLaVA 1.5 7B)",
     )
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
     parser.add_argument(
@@ -978,8 +993,10 @@ def main():
     )
     args = parser.parse_args()
 
+    global PROMPT_TEMPLATE
     config = MODEL_CONFIGS[args.model]
     model_id = config["model_id"]
+    PROMPT_TEMPLATE = config["prompt_template"]
     output_dir = os.path.join(args.output_dir, args.model)
     os.makedirs(output_dir, exist_ok=True)
 

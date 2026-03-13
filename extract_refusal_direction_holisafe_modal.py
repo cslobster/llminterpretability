@@ -1,5 +1,10 @@
 """
-Extract refusal directions from PaliGemma (3B / 10B) using HoliSafe-Bench — Modal GPU version.
+Extract refusal directions from VLMs using HoliSafe-Bench — Modal GPU version.
+
+Supported models:
+  - PaliGemma 3B (google/paligemma-3b-pt-224)
+  - PaliGemma 2 10B (google/paligemma2-10b-pt-224)
+  - LLaVA 1.5 7B (llava-hf/llava-1.5-7b-hf)
 
 Runs the full experiment pipeline on Modal's cloud GPU infrastructure.
 Identical logic to extract_refusal_direction_holisafe.py but adapted for Modal.
@@ -16,6 +21,9 @@ Usage:
 
     # Run 10B model
     modal run extract_refusal_direction_holisafe_modal.py --model 10b
+
+    # Run LLaVA 1.5 7B
+    modal run extract_refusal_direction_holisafe_modal.py --model llava-7b
 
     # Results are saved to a Modal Volume and downloaded locally
 """
@@ -36,7 +44,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
         "torch",
-        "transformers",
+        "transformers>=4.45.0,<5.0.0",
         "tqdm",
         "datasets",
         "Pillow",
@@ -62,11 +70,19 @@ MODEL_CONFIGS = {
         "model_id": "google/paligemma-3b-pt-224",
         "name": "PaliGemma 3B (Gemma 2B backbone)",
         "default_batch_size": 16,
+        "prompt_template": "<image> {question}",
     },
     "10b": {
         "model_id": "google/paligemma2-10b-pt-224",
         "name": "PaliGemma 2 10B (Gemma 2 9B backbone)",
         "default_batch_size": 8,
+        "prompt_template": "<image> {question}",
+    },
+    "llava-7b": {
+        "model_id": "llava-hf/llava-1.5-7b-hf",
+        "name": "LLaVA 1.5 7B (Vicuna 7B backbone)",
+        "default_batch_size": 8,
+        "prompt_template": "USER: <image>\n{question}\nASSISTANT:",
     },
 }
 
@@ -129,7 +145,7 @@ def run_experiment(model_key: str = "3b", batch_size: int = 0):
     import torch.nn.functional as F
     from PIL import Image as PILImage
     from tqdm import tqdm
-    from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
+    from transformers import AutoModelForVision2Seq, AutoProcessor
 
     # Use float64 on GPU (CUDA supports it, unlike MPS)
     DTYPE_HIGH = torch.float64
@@ -147,7 +163,7 @@ def run_experiment(model_key: str = "3b", batch_size: int = 0):
 
     HARMFUL_TYPES = ["USU", "SUU", "UUU", "SSU"]
     HARMLESS_TYPE = "SSS"
-    PALIGEMMA_PROMPT_TEMPLATE = " {question}"
+    PROMPT_TEMPLATE = config["prompt_template"]
 
     N_TRAIN = 128
     N_VAL = 32
@@ -244,7 +260,7 @@ def run_experiment(model_key: str = "3b", batch_size: int = 0):
         os.environ["TRANSFORMERS_CACHE"] = os.path.join(MODEL_CACHE_MOUNT, "hub")
 
         token = os.environ.get("HF_TOKEN")
-        model = PaliGemmaForConditionalGeneration.from_pretrained(
+        model = AutoModelForVision2Seq.from_pretrained(
             model_id, torch_dtype=dtype, device_map="auto", token=token,
         ).eval()
 
@@ -258,7 +274,7 @@ def run_experiment(model_key: str = "3b", batch_size: int = 0):
     def process_multimodal_batch(processor, samples: list[MultimodalSample], device):
         images = [s.image for s in samples]
         prompts = [
-            "<image>" + PALIGEMMA_PROMPT_TEMPLATE.format(question=s.question)
+            PROMPT_TEMPLATE.format(question=s.question)
             for s in samples
         ]
         inputs = processor(
@@ -1239,8 +1255,8 @@ def main(model: str = "3b", batch_size: int = 0, download_only: bool = False):
     Run the refusal direction extraction experiment on Modal GPU.
 
     Args:
-        model: Model variant — '3b' (PaliGemma 3B) or '10b' (PaliGemma 2 10B)
-        batch_size: Batch size for inference (0 = use model default: 16 for 3b, 8 for 10b)
+        model: Model variant — '3b', '10b', or 'llava-7b'
+        batch_size: Batch size for inference (0 = use model default)
         download_only: If True, only download existing results without re-running
     """
     if model not in MODEL_CONFIGS:
