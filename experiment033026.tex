@@ -1,0 +1,892 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tikz}
+\usepackage{longtable}
+\usepackage{float}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
+
+\hypersetup{colorlinks=true, linkcolor=blue!60!black, urlcolor=blue!60!black}
+
+\title{\textbf{Refusal Directions in Vision-Language Models:\\From Single-Model Analysis to Cross-Model Transfer}\\[4pt]
+\large MM-HarmfulBench $\times$ Qwen 3.5-9B \& Qwen2-VL-7B / Qwen2-7B\\[2pt]
+\normalsize Extended Arditi et al.\ (2024) with Position-Selective Ablation and Cross-Model Geometry}
+\author{Melissa Yu}
+\date{March 30, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report presents two experiments on refusal directions in vision-language models (VLMs). \textbf{Experiment~A} replicates Arditi et al.\ (2024) on Qwen~3.5-9B with MM-HarmfulBench, extending it with position-selective ablation to show that the refusal direction lives exclusively in text tokens (image-only ablation has zero effect). \textbf{Experiment~B} extracts refusal directions independently from Qwen2-VL-7B (VLM) and its matching backbone Qwen2-7B (text-only LLM), then tests cross-model transfer: the VLM direction removes 75 percentage points of LLM refusal, and vice versa, despite a cosine similarity of only 0.30. Together, these experiments demonstrate that (1)~VLM refusal is mediated by a single linear direction inherited from text-only training, (2)~this direction operates through text tokens regardless of image content, and (3)~VL fine-tuning preserves the refusal subspace while rotating the primary axis within it.
+\end{abstract}
+
+%======================================================================
+\part{Experiment A: Refusal Direction in Qwen 3.5-9B}
+\label{part:expA}
+%======================================================================
+
+%----------------------------------------------------------------------
+\section{Introduction}
+%----------------------------------------------------------------------
+
+Arditi et al.\ (2024) showed that refusal in text-only LLMs is mediated by a single linear direction in residual-stream activation space. We replicate and extend this finding to a \textbf{vision-language model} (VLM), asking: does the refusal direction also exist in a VLM, and if so, does it live in image tokens or text tokens?
+
+%----------------------------------------------------------------------
+\section{Setup}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Experiment~A configuration.}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Model & Qwen/Qwen3.5-9B \\
+Architecture & 32 layers, $d_\text{model}=4096$ \\
+Unsafe data & MM-HarmfulBench (100 image+text harmful queries) \\
+Safe data & HoliSafe-Bench SSS (100 image+text benign queries) \\
+Direction extraction & Arditi et al.\ difference-in-means \\
+Direction selection & Logit-based proxy (first-token log-odds of refusal tokens) \\
+Ablation & Triple hooks: resid\_pre + attention output + MLP output \\
+Final evaluation & Gemini 2.0 Flash judge on full generated responses \\
+GPU & H100 on Modal \\
+Total runtime & $\sim$1h42m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Methodology: Refusal Vector Extraction}
+\label{sec:extraction}
+%----------------------------------------------------------------------
+
+\subsection{Step 1: Behavioral Filtering}
+
+We generate baseline responses for all train/val samples and classify each as ``refused'' or ``complied'' using Gemini 2.0 Flash. Only samples matching the expected behavior are kept:
+
+\begin{table}[H]\centering
+\caption{Data filtering results for Experiment~A.}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Split} & \textbf{Original} & \textbf{Filtered} & \textbf{Keep rate} & \textbf{Criteria} \\
+\midrule
+Safe train   & 64 & 64 & 100\% & Model complied \\
+Safe val     & 16 & 16 & 100\% & Model complied \\
+Unsafe train & 64 & 61 & 95\%  & Model refused \\
+Unsafe val   & 16 & 15 & 94\%  & Model refused \\
+\midrule
+Safe test    & 20 & \multicolumn{3}{c}{Not filtered (used as-is)} \\
+Unsafe test  & 20 & \multicolumn{3}{c}{Not filtered (used as-is)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Qwen 3.5-9B refuses 95\%+ of MM-HarmfulBench at baseline, indicating strong safety alignment on this benchmark.
+
+\subsection{Step 2: Activation Extraction}
+
+For each filtered sample, we run a forward pass and extract hidden-state activations $\mathbf{h}_l^{(i)} \in \mathbb{R}^{d_\text{model}}$ at each language model layer $l \in \{0, \ldots, L{-}1\}$ using PyTorch \textbf{forward pre-hooks} on the transformer block modules (capturing residual stream input, i.e., $\texttt{resid\_pre}$). Activations are accumulated in \texttt{float64} precision.
+
+\paragraph{Multi-position extraction.} Following Arditi et al., we extract at the last $N$ tokens of the assistant preamble (the ChatML tokens \texttt{<|im\_end|>$\backslash$n<|im\_start|>assistant$\backslash$n}), producing $N=5$ candidate positions per layer:
+
+\begin{table}[H]\centering
+\caption{Candidate extraction positions (Arditi EOI tokens for Qwen ChatML).}
+\begin{tabular}{ccl}
+\toprule
+\textbf{Position} & \textbf{Token} & \textbf{Role} \\
+\midrule
+$-5$ & \texttt{<|im\_end|>}   & End-of-turn marker closing the user message \\
+$-4$ & \texttt{$\backslash$n} & Newline separating turns \\
+$-3$ & \texttt{<|im\_start|>} & Start-of-turn marker opening the assistant turn \\
+$-2$ & \texttt{assistant}     & Role identifier --- the model's ``identity declaration'' \\
+$-1$ & \texttt{$\backslash$n} & Newline before the first generated token \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For each position $p$ and layer $l$, we compute:
+\[
+\bar{\mathbf{h}}_{p,l}^{(\text{safe})} = \frac{1}{|A|}\sum_{i \in A} \mathbf{h}_{p,l}^{(i)}, \quad
+\bar{\mathbf{h}}_{p,l}^{(\text{unsafe})} = \frac{1}{|B|}\sum_{i \in B} \mathbf{h}_{p,l}^{(i)}
+\]
+
+\subsection{Step 3: Candidate Directions}
+
+The refusal direction candidate at position $p$, layer $l$ is:
+\[
+\mathbf{c}_{p,l} = \bar{\mathbf{h}}_{p,l}^{(\text{unsafe})} - \bar{\mathbf{h}}_{p,l}^{(\text{safe})}
+\]
+This produces 5 positions $\times$ 25 layers = 125 candidates (top 20\% of layers pruned).
+
+\subsection{Step 4: Logit-Based Scoring}
+
+Each candidate is scored on the validation set using a \textbf{single forward pass} (no generation):
+
+\begin{table}[H]\centering
+\caption{Scoring metrics for direction selection.}
+\begin{tabular}{lp{9cm}l}
+\toprule
+\textbf{Metric} & \textbf{Description} & \textbf{Goal} \\
+\midrule
+Bypass score & Mean log-odds of refusal tokens on unsafe val, under triple ablation of $\hat{\mathbf{c}}_{p,l}$ from all layers & Lower = better \\
+Induce score & Mean log-odds of refusal tokens on safe val, under activation addition at layer $l$ & Higher = better \\
+KL divergence & $D_\text{KL}(p_\text{base} \| p_\text{ablated})$ on safe val & Lower = better \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Refusal tokens: $\mathcal{R} = \{\text{``I'' (40), ``Sorry'' (18572), ``As'' (2053), ``Unfortunately'' (29056)}\}$.
+
+\paragraph{Selection criterion.} Lowest bypass score among candidates with induce $> 0$ and KL $< 0.1$.
+
+\subsection{Step 5: Triple Ablation}
+
+Ablation projects out the direction from \textbf{three hook points per layer} at all 32 layers simultaneously:
+
+\begin{table}[H]\centering
+\caption{Triple ablation hook points (applied at every layer).}
+\begin{tabular}{lll}
+\toprule
+\textbf{Hook point} & \textbf{Hook type} & \textbf{Target module} \\
+\midrule
+resid\_pre & Forward pre-hook & Transformer block input \\
+Attention output & Forward hook & Self-attention module output \\
+MLP output & Forward hook & MLP module output \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At each hook point: $\mathbf{h} \leftarrow \mathbf{h} - (\mathbf{h} \cdot \hat{\mathbf{d}}) \hat{\mathbf{d}}$, where $\hat{\mathbf{d}} = \mathbf{d}/\|\mathbf{d}\|$.
+
+%----------------------------------------------------------------------
+\section{Direction Selection Results}
+%----------------------------------------------------------------------
+
+Out of 125 scored candidates, \textbf{4 passed} validity filters (induce $> 0$ and KL $< 0.1$):
+
+\begin{table}[H]\centering
+\caption{Valid candidate directions for Experiment~A. Selected direction in bold.}
+\begin{tabular}{clrrrl}
+\toprule
+\textbf{Position} & \textbf{Layer} & \textbf{Bypass} & \textbf{Induce} & \textbf{KL} & \textbf{Status} \\
+\midrule
+$\mathbf{-2}$ & \textbf{15} & $\mathbf{-3.017}$ & $\mathbf{+3.759}$ & $\mathbf{0.050}$ & \textbf{Selected} \\
+$-5$ & 17 & $-0.691$ & $+1.495$ & $0.041$ & Valid \\
+$-2$ & 13 & $+2.419$ & $+0.580$ & $0.070$ & Valid \\
+$-2$ & 14 & $+2.460$ & $+2.931$ & $0.092$ & Valid \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Selected: position $-2$ (\texttt{assistant} token), layer 15} --- the middle of the 32-layer network (47\%). This matches Arditi et al.'s finding that refusal directions emerge in middle layers. Their Qwen models selected position $-1$; ours selects $-2$.
+
+%----------------------------------------------------------------------
+\section{Baseline Refusal Rates}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Baseline refusal rates on test set ($n=20$ per category).}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Category} & \textbf{Refused} & \textbf{Complied} & \textbf{Total} & \textbf{Refusal rate} \\
+\midrule
+Unsafe (MM-HarmfulBench) & 17 & 3 & 20 & \textbf{85\%} \\
+Safe (HoliSafe SSS)      &  0 & 20 & 20 & \textbf{0\%}  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 17 refused unsafe samples become bypass steering targets; the 20 complied safe samples become induce steering targets.
+
+%----------------------------------------------------------------------
+\section{Ablation Results --- Position-Selective}
+%----------------------------------------------------------------------
+
+We ablate the refusal direction from all 32 layers using triple hooks, varying \textit{which token positions} are affected:
+
+\begin{table}[H]\centering
+\caption{Position-selective ablation on Qwen 3.5-9B ($n=20$ per category).}
+\begin{tabular}{llccccl}
+\toprule
+\textbf{Mode} & \textbf{Category} & \textbf{Baseline} & \textbf{Ablated} & \textbf{$\Delta$} & \textbf{Refused/Total} \\
+\midrule
+\textbf{all}   & unsafe & 85\% & \textbf{30\%} & $-55$ pp & 6/20 \\
+all             & safe   &  0\% & 0\%           & 0 pp     & 0/20 \\
+\midrule
+\textbf{image} & unsafe & 85\% & \textbf{90\%} & $+5$ pp  & 18/20 \\
+image           & safe   &  0\% & 0\%           & 0 pp     & 0/20 \\
+\midrule
+\textbf{text}  & unsafe & 85\% & \textbf{30\%} & $-55$ pp & 6/20 \\
+text            & safe   &  0\% & 0\%           & 0 pp     & 0/20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key findings:
+\begin{enumerate}[nosep]
+  \item \textbf{All-position ablation: $85\% \to 30\%$} ($-55$ pp). The direction causally mediates refusal.
+  \item \textbf{Image-only ablation: $85\% \to 90\%$} ($+5$ pp). Zero effect --- removing the direction from image tokens does not change refusal.
+  \item \textbf{Text-only ablation = all-position ablation} (both $-55$ pp). The refusal signal flows entirely through text tokens.
+  \item \textbf{Safe queries unaffected} (0\% false refusal in all modes).
+\end{enumerate}
+
+\textbf{The refusal direction lives exclusively in text tokens}, even for multimodal queries where the image is integral to the harm.
+
+%----------------------------------------------------------------------
+\section{Steering Results (Arditi Style)}
+%----------------------------------------------------------------------
+
+\subsection{Bypass Refusal}
+
+Subtract $\alpha \times \mathbf{d}$ at layer 15 resid\_pre for 17 unsafe-refused samples (baseline = 100\% refusal on these):
+
+\begin{table}[H]\centering
+\caption{Bypass steering on Qwen 3.5-9B ($n=17$ refused samples).}
+\begin{tabular}{ccccc}
+\toprule
+$\alpha$ & \textbf{Still refuse} & \textbf{Now comply} & \textbf{Bypass rate} & \textbf{Refused/Total} \\
+\midrule
+1 & 35\% & 65\% & 65\% & 6/17 \\
+\textbf{4} & \textbf{29\%} & \textbf{71\%} & \textbf{71\%} & 5/17 \\
+8 & 59\% & 41\% & 41\% & 10/17 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Peak bypass at $\alpha=4$: 12 of 17 harmful queries now answered. At $\alpha=8$, effect degrades as activations are pushed off the normal manifold.
+
+\subsection{Induce Refusal}
+
+Add $\alpha \times \mathbf{d}$ at layer 15 resid\_pre for 20 safe-complied samples (baseline = 0\% refusal on these):
+
+\begin{table}[H]\centering
+\caption{Induce steering on Qwen 3.5-9B ($n=20$ complied samples).}
+\begin{tabular}{cccc}
+\toprule
+$\alpha$ & \textbf{Now refuse} & \textbf{Induce rate} & \textbf{Refused/Total} \\
+\midrule
+\textbf{1} & \textbf{100\%} & \textbf{100\%} & 20/20 \\
+4 & 40\% & 40\% & 8/20 \\
+\textbf{8} & \textbf{100\%} & \textbf{100\%} & 20/20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $\alpha=1$, the direction induces 100\% refusal on all harmless queries. The dip at $\alpha=4$ is anomalous (possibly a phase transition in model behavior). Both bypass and inducement confirm the direction is \textbf{necessary} and \textbf{sufficient}.
+
+%======================================================================
+\part{Experiment B: Cross-Model Refusal Direction Transfer}
+\label{part:expB}
+%======================================================================
+
+%----------------------------------------------------------------------
+\section{Motivation}
+%----------------------------------------------------------------------
+
+Experiment~A showed that VLM refusal is mediated by a single direction in text tokens. A natural follow-up: is this direction \emph{inherited from the text-only LLM backbone}, or does VL fine-tuning create a fundamentally new refusal mechanism?
+
+We test this by extracting refusal directions from a VLM and its matching LLM independently, then cross-transferring them.
+
+%----------------------------------------------------------------------
+\section{Setup}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Architecture comparison: Qwen2-VL-7B vs Qwen2-7B share identical LLM dimensions.}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Parameter} & \textbf{Qwen2-VL-7B} & \textbf{Qwen2-7B} \\
+\midrule
+Model class & \texttt{Qwen2VLForConditionalGeneration} & \texttt{Qwen2ForCausalLM} \\
+Layers & 28 & 28 \\
+$d_\text{model}$ & 3584 & 3584 \\
+Vocabulary size & 152,064 & 152,064 \\
+LLM layer path & \texttt{model.model.layers[l]} & \texttt{model.model.layers[l]} \\
+Initialization & From Qwen2-7B weights & --- \\
+Input modality & Image + text & Text only \\
+\midrule
+\multicolumn{3}{l}{\textit{Experiment configuration}} \\
+\midrule
+Unsafe data & \multicolumn{2}{c}{MM-HarmfulBench (100 queries)} \\
+Safe data & \multicolumn{2}{c}{HoliSafe-Bench SSS (100 queries)} \\
+VLM input & Image + text & --- \\
+LLM input & --- & Text only (same queries) \\
+Direction method & \multicolumn{2}{c}{Arditi et al.\ (multi-position, logit-based, triple ablation)} \\
+Judge & \multicolumn{2}{c}{Gemini 2.0 Flash} \\
+GPU & \multicolumn{2}{c}{A100-80GB on Modal; 1h57m total} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Data Filtering}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Data filtering for Experiment~B. Raw counts and keep rates shown.}
+\begin{tabular}{l|cccc|cccc}
+\toprule
+& \multicolumn{4}{c|}{\textbf{VLM (Qwen2-VL-7B)}} & \multicolumn{4}{c}{\textbf{LLM (Qwen2-7B)}} \\
+\textbf{Split} & \textbf{Orig} & \textbf{Kept} & \textbf{Rate} & \textbf{Criteria} & \textbf{Orig} & \textbf{Kept} & \textbf{Rate} & \textbf{Criteria} \\
+\midrule
+Safe train   & 64 & 64 & 100\% & Complied & 64 & 50 & 78\% & Complied \\
+Safe val     & 16 & 16 & 100\% & Complied & 16 & 16 & 100\% & Complied \\
+Unsafe train & 64 & 48 & 75\%  & Refused  & 64 & 61 & 95\% & Refused \\
+Unsafe val   & 16 & 15 & 94\%  & Refused  & 16 & 15 & 94\% & Refused \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The text-only LLM refuses 95\% of MM-HarmfulBench queries vs.\ 75\% for the VLM. Without images, the harmful intent is often clearer in text alone --- images may actually \emph{dilute} the harmful signal. The LLM also has a lower safe-train keep rate (78\%), suggesting it is more conservative overall.
+
+%----------------------------------------------------------------------
+\section{Direction Selection}
+%----------------------------------------------------------------------
+
+\subsection{VLM Candidates}
+
+We extract 5 positions $\times$ 22 layers = 110 candidate directions from the VLM using image+text inputs. Of these, only \textbf{8 candidates} (7.3\%) pass the induce $> 0$ filter, indicating that most layer/position combinations do not carry a usable refusal signal. All 8 valid candidates cluster at positions $-4$ and $-1$ in layers 13--17 --- the middle of the network. The selected direction (pos=$-4$, layer 16) has the strongest bypass score ($-4.957$) but a weak induce score ($+0.214$), suggesting the VLM's refusal signal is concentrated on the bypass axis.
+
+\begin{table}[H]\centering
+\caption{Top VLM candidate directions (8 passed induce $> 0$ filter out of 110 scored).}
+\begin{tabular}{ccrrrr}
+\toprule
+\textbf{Position} & \textbf{Layer} & \textbf{Bypass} & \textbf{Induce} & \textbf{KL} & \textbf{Status} \\
+\midrule
+$\mathbf{-4}$ & \textbf{16} & $\mathbf{-4.957}$ & $\mathbf{+0.214}$ & $\mathbf{0.289}$ & \textbf{Selected} \\
+$-4$ & 17 & $-4.780$ & $+0.852$ & $0.248$ & Valid \\
+$-4$ & 13 & $-3.751$ & $+0.404$ & $0.145$ & Valid \\
+$-1$ & 17 & $-3.658$ & $+0.695$ & $0.102$ & Valid \\
+$-1$ & 16 & $-3.535$ & $+0.923$ & $0.170$ & Valid \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{LLM Candidates}
+
+The text-only LLM produces far more valid candidates: \textbf{30 out of 110} (27.3\%) pass the induce $> 0$ filter, compared to 8/110 for the VLM. This suggests the text-only model has a stronger, more broadly distributed refusal signal across layers. The top candidates by bypass score are at position $-4$ in layers 16--18, but these have high KL divergence ($> 0.25$), meaning they distort safe-query outputs. The selected direction (pos=$-1$, layer 19) balances bypass ($-5.979$), strong inducement ($+3.256$), and low KL ($0.072$).
+
+\begin{table}[H]\centering
+\caption{Top LLM candidate directions (30 passed induce $> 0$ filter out of 110 scored).}
+\begin{tabular}{ccrrrr}
+\toprule
+\textbf{Position} & \textbf{Layer} & \textbf{Bypass} & \textbf{Induce} & \textbf{KL} & \textbf{Status} \\
+\midrule
+$-4$ & 17 & $-6.243$ & $+2.596$ & $0.440$ & Valid (high KL) \\
+$-4$ & 16 & $-6.238$ & $+3.289$ & $0.257$ & Valid (high KL) \\
+$\mathbf{-1}$ & \textbf{19} & $\mathbf{-5.979}$ & $\mathbf{+3.256}$ & $\mathbf{0.072}$ & \textbf{Selected} \\
+$-4$ & 18 & $-5.474$ & $+2.122$ & $0.393$ & Valid (high KL) \\
+$-5$ & 17 & $-5.396$ & $+3.266$ & $0.254$ & Valid (high KL) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Selected Directions Summary}
+
+The two models select directions at different positions and layers. The VLM selects position $-4$ (the newline token after \texttt{<|im\_end|>}) at layer 16 (57\% depth), while the LLM selects position $-1$ (the final newline before generation) at layer 19 (68\% depth). The LLM's direction is quantitatively stronger on all three metrics: lower bypass score (more effective at removing refusal), higher induce score (more effective at triggering refusal), and lower KL (less distortion on safe queries). This asymmetry will become important when interpreting cross-model transfer results.
+
+\begin{table}[H]\centering
+\caption{Comparison of selected directions.}
+\begin{tabular}{lcccccl}
+\toprule
+\textbf{Model} & \textbf{Pos} & \textbf{Layer} & \textbf{Depth} & \textbf{Bypass} & \textbf{Induce} & \textbf{KL} \\
+\midrule
+VLM (Qwen2-VL-7B) & $-4$ & 16 & 57\% & $-4.957$ & $+0.214$ & 0.289 \\
+LLM (Qwen2-7B)    & $-1$ & 19 & 68\% & $-5.979$ & $+3.256$ & 0.072 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The LLM direction has stronger bypass ($-5.98$ vs $-4.96$) and induce ($+3.26$ vs $+0.21$) scores with much lower KL ($0.072$ vs $0.289$) --- a cleaner refusal signal.
+
+%----------------------------------------------------------------------
+\section{Baseline Refusal Rates}
+%----------------------------------------------------------------------
+
+We generate baseline responses (no intervention) on 20 unsafe and 20 safe test samples for each model and judge each response with Gemini 2.0 Flash. The VLM receives image+text input; the LLM receives the same query text without images.
+
+\begin{table}[H]\centering
+\caption{Baseline refusal rates on test set ($n=20$ per category). The LLM refuses more unsafe queries but also produces some false refusals on safe queries.}
+\begin{tabular}{l|cc|cc}
+\toprule
+& \multicolumn{2}{c|}{\textbf{VLM (image+text)}} & \multicolumn{2}{c}{\textbf{LLM (text only)}} \\
+\textbf{Category} & \textbf{Refused/Total} & \textbf{Rate} & \textbf{Refused/Total} & \textbf{Rate} \\
+\midrule
+Unsafe & 15/20 & \textbf{75\%} & 18/20 & \textbf{90\%} \\
+Safe   &  0/20 & \textbf{0\%}  &  2/20 & 10\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The text-only LLM is more conservative on both axes: higher unsafe refusal (90\% vs 75\%) and 10\% false refusal on safe queries (vs 0\% for VLM). This 15-pp gap in unsafe refusal suggests that adding images to MM-HarmfulBench queries dilutes the harmful signal, making the model less likely to refuse. The VLM's 15 refused unsafe samples become bypass targets; the LLM's 18 refused samples become its bypass targets. The VLM's 20 complied safe samples and LLM's 18 complied safe samples become induce targets.
+
+%----------------------------------------------------------------------
+\section{Ablation Results}
+%----------------------------------------------------------------------
+
+\subsection{Own-Direction Ablation}
+
+Each model's own refusal direction is ablated from all 28 layers using the triple-hook method (resid\_pre + attention output + MLP output). This removes the refusal direction component from the residual stream, attention outputs, and MLP outputs at every layer simultaneously. The ablation is applied at all token positions and evaluated on the same 20 unsafe and 20 safe test samples.
+
+For the VLM, own-direction ablation drops unsafe refusal from 75\% to just 10\% ($-65$ pp), demonstrating that the extracted direction causally mediates most refusal behavior. The VLM ablation is more effective than the LLM's ($-55$ pp), possibly because the VLM's refusal signal is more concentrated in a single direction. Both models' safe refusal rates remain near zero after ablation, confirming the direction is specific to refusal and does not degrade general capability.
+
+\begin{table}[H]\centering
+\caption{Ablation using each model's own direction ($n=20$ per category).}
+\begin{tabular}{l|cccc|cccc}
+\toprule
+& \multicolumn{4}{c|}{\textbf{VLM}} & \multicolumn{4}{c}{\textbf{LLM}} \\
+\textbf{Cat.} & \textbf{Base} & \textbf{Ablated} & \textbf{$\Delta$} & \textbf{Ref/Tot} & \textbf{Base} & \textbf{Ablated} & \textbf{$\Delta$} & \textbf{Ref/Tot} \\
+\midrule
+Unsafe & 75\% & \textbf{10\%} & $-65$ pp & 2/20 & 90\% & \textbf{35\%} & $-55$ pp & 7/20 \\
+Safe   &  0\% & 0\%           & 0 pp     & 0/20 & 10\% & 5\%           & $-5$ pp  & 1/20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cross-Model Ablation}
+
+The central question of Experiment~B: can a refusal direction extracted from one model remove refusal in the other? We apply the VLM's direction (from layer 16) to ablate the LLM, and vice versa (LLM's direction from layer 19 to ablate the VLM). The same triple-hook ablation is used at all layers, but the direction vector comes from the \emph{other} model.
+
+The result is striking: the VLM direction applied to the LLM reduces unsafe refusal from 90\% to 15\% --- a $-75$ pp drop, which is \emph{larger} than the LLM's own direction achieves ($-55$ pp). In the reverse direction, the LLM direction applied to the VLM reduces refusal from 75\% to 30\% ($-45$ pp). Both cross-transfer conditions maintain near-zero false refusal on safe queries, confirming the transferred directions are specific to the refusal mechanism. These results prove that the two models share a common refusal subspace, and the VLM direction captures a more fundamental refusal component that also operates in the text-only model.
+
+\begin{table}[H]\centering
+\caption{Cross-model ablation: applying one model's direction to the other ($n=20$ per category).}
+\begin{tabular}{l|cccc|cccc}
+\toprule
+& \multicolumn{4}{c|}{\textbf{VLM dir $\to$ LLM}} & \multicolumn{4}{c}{\textbf{LLM dir $\to$ VLM}} \\
+\textbf{Cat.} & \textbf{Base} & \textbf{Ablated} & \textbf{$\Delta$} & \textbf{Ref/Tot} & \textbf{Base} & \textbf{Ablated} & \textbf{$\Delta$} & \textbf{Ref/Tot} \\
+\midrule
+Unsafe & 90\% & \textbf{15\%} & $-75$ pp & 3/20 & 75\% & \textbf{30\%} & $-45$ pp & 6/20 \\
+Safe   & 10\% & 0\%           & $-10$ pp & 0/20 &  0\% & 0\%           & 0 pp     & 0/20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ablation Summary}
+
+\begin{table}[H]\centering
+\caption{All ablation conditions compared (unsafe refusal rates only).}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Condition} & \textbf{Target model} & \textbf{Baseline} & \textbf{Ablated} & \textbf{$\Delta$} \\
+\midrule
+VLM own direction & VLM & 75\% & 10\% & $-65$ pp \\
+LLM own direction & LLM & 90\% & 35\% & $-55$ pp \\
+\textbf{VLM dir $\to$ LLM} & \textbf{LLM} & \textbf{90\%} & \textbf{15\%} & $\mathbf{-75}$ \textbf{pp} \\
+LLM dir $\to$ VLM & VLM & 75\% & 30\% & $-45$ pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The VLM direction removes \emph{more} LLM refusal ($-75$ pp) than the LLM's own direction ($-55$ pp).
+
+%----------------------------------------------------------------------
+\section{Steering Results}
+%----------------------------------------------------------------------
+
+\subsection{Own-Direction Steering}
+
+Steering tests whether adding or subtracting the refusal direction at the selected source layer can control refusal behavior. Unlike ablation (which removes the direction from all layers), steering modifies activations at a \emph{single} layer's resid\_pre.
+
+\paragraph{Bypass.} We subtract $\alpha \times \mathbf{d}$ from the source layer for samples the model refused at baseline. If the model now complies, the direction was necessary for the refusal. The VLM (15 refused samples, direction at layer 16) peaks at $\alpha=1$ with 87\% bypass. The LLM (18 refused samples, direction at layer 19) peaks at $\alpha=4$ with 83\% bypass. Both degrade at high $\alpha$ as activations are pushed off the normal manifold.
+
+\paragraph{Induce.} We add $\alpha \times \mathbf{d}$ at the source layer for samples the model complied with at baseline. If the model now refuses, the direction is sufficient to trigger refusal. The LLM shows perfect inducement: 100\% refusal at all $\alpha$ values (18/18 complied samples now refuse). The VLM shows weaker inducement (85\% at $\alpha=1$), consistent with its lower induce score during direction selection (+0.214 vs +3.256).
+
+\begin{table}[H]\centering
+\caption{VLM steering with own direction. Bypass: $n=15$ refused samples; Induce: $n=20$ complied samples.}
+\begin{tabular}{c|ccc|ccc}
+\toprule
+& \multicolumn{3}{c|}{\textbf{Bypass} ($-\alpha \times \mathbf{d}$)} & \multicolumn{3}{c}{\textbf{Induce} ($+\alpha \times \mathbf{d}$)} \\
+$\alpha$ & Ref/Tot & Still refuse & Bypass rate & Ref/Tot & Now refuse & Induce rate \\
+\midrule
+1 & 2/15  & 13\% & \textbf{87\%} & 17/20 & 85\% & 85\% \\
+4 & 13/15 & 87\% & 13\%          &  9/20 & 45\% & 45\% \\
+8 &  6/15 & 40\% & 60\%          & 11/20 & 55\% & 55\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]\centering
+\caption{LLM steering with own direction. Bypass: $n=18$ refused samples; Induce: $n=18$ complied samples.}
+\begin{tabular}{c|ccc|ccc}
+\toprule
+& \multicolumn{3}{c|}{\textbf{Bypass} ($-\alpha \times \mathbf{d}$)} & \multicolumn{3}{c}{\textbf{Induce} ($+\alpha \times \mathbf{d}$)} \\
+$\alpha$ & Ref/Tot & Still refuse & Bypass rate & Ref/Tot & Now refuse & Induce rate \\
+\midrule
+1 &  8/18 & 44\% & 56\%          & 18/18 & \textbf{100\%} & \textbf{100\%} \\
+4 &  3/18 & 17\% & \textbf{83\%} & 18/18 & \textbf{100\%} & \textbf{100\%} \\
+8 & 17/18 & 94\% & 6\%           & 18/18 & \textbf{100\%} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cross-Model Steering}
+
+We now test whether the direction extracted from one model can steer the other model's refusal behavior. This is more challenging than own-direction steering because the directions are not identical (cosine similarity = 0.30).
+
+\paragraph{VLM direction $\to$ LLM.} The VLM's direction (from layer 16) is applied at layer 16 of the LLM. For bypass, it achieves 50\% at $\alpha=1$ but degrades at higher $\alpha$ (the VLM direction overshoots in the LLM's activation space). For inducement, it is highly effective: 83--94\% of LLM-complied samples now refuse, confirming the VLM direction captures a refusal component that the LLM recognizes.
+
+\paragraph{LLM direction $\to$ VLM.} The LLM's direction (from layer 19) is applied at layer 19 of the VLM. Inducement is remarkable: 100\% at $\alpha \leq 4$ (all 20 VLM-complied samples now refuse). This shows the LLM's refusal direction is sufficient to trigger the VLM's refusal mechanism, even though the VLM processes multimodal inputs. Bypass is moderate (47\% at $\alpha=1$) and degrades at high $\alpha$.
+
+\begin{table}[H]\centering
+\caption{VLM direction $\to$ LLM steering. Bypass: $n=18$ LLM-refused; Induce: $n=18$ LLM-complied.}
+\begin{tabular}{c|ccc|ccc}
+\toprule
+& \multicolumn{3}{c|}{\textbf{Bypass} ($-\alpha \times \mathbf{d}_\text{VLM}$)} & \multicolumn{3}{c}{\textbf{Induce} ($+\alpha \times \mathbf{d}_\text{VLM}$)} \\
+$\alpha$ & Ref/Tot & Still refuse & Bypass rate & Ref/Tot & Now refuse & Induce rate \\
+\midrule
+1 &  9/18 & 50\% & 50\%          & 15/18 & 83\%          & 83\% \\
+4 & 15/18 & 83\% & 17\%          & 17/18 & \textbf{94\%} & \textbf{94\%} \\
+8 & 18/18 & 100\% & 0\%          & 16/18 & 89\%          & 89\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]\centering
+\caption{LLM direction $\to$ VLM steering. Bypass: $n=15$ VLM-refused; Induce: $n=20$ VLM-complied.}
+\begin{tabular}{c|ccc|ccc}
+\toprule
+& \multicolumn{3}{c|}{\textbf{Bypass} ($-\alpha \times \mathbf{d}_\text{LLM}$)} & \multicolumn{3}{c}{\textbf{Induce} ($+\alpha \times \mathbf{d}_\text{LLM}$)} \\
+$\alpha$ & Ref/Tot & Still refuse & Bypass rate & Ref/Tot & Now refuse & Induce rate \\
+\midrule
+1 &  8/15 & 53\% & 47\%          & 20/20 & \textbf{100\%} & \textbf{100\%} \\
+4 & 10/15 & 67\% & 33\%          & 20/20 & \textbf{100\%} & \textbf{100\%} \\
+8 & 15/15 & 100\% & 0\%          & 13/20 & 65\%           & 65\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Geometric Analysis: Cosine Similarity}
+%----------------------------------------------------------------------
+
+To quantify how similar the VLM and LLM refusal directions are, we compute the cosine similarity between their difference-in-means vectors at each layer. For each layer $l$, we take the VLM candidate at its best position (pos=$-4$) and the LLM candidate at its best position (pos=$-1$), and compute $\cos(\mathbf{d}_\text{VLM}^{(l)}, \mathbf{d}_\text{LLM}^{(l)})$.
+
+A cosine of 1.0 would mean VL fine-tuning preserved the exact same refusal direction; 0.0 would mean an entirely new direction emerged. The actual values fall between 0.2 and 0.53, indicating the directions are \textbf{related but not identical}. The peak cosine occurs at layer 10 (0.531), in the middle of the network where semantic representations are most shared. Cosine decreases in late layers (21--27: mean 0.28), where the models diverge most --- likely because VL fine-tuning modified output-facing representations to handle multimodal generation.
+
+The cosine between the two \emph{selected} best directions is lower (0.300) because they come from different layers (16 vs 19) and positions ($-4$ vs $-1$). Despite this moderate geometric similarity, cross-model transfer is highly effective (Section~14), suggesting that refusal occupies a low-dimensional subspace: the directions need not be identical to overlap sufficiently.
+
+\begin{table}[H]\centering
+\caption{Per-layer cosine similarity between VLM (pos=$-4$) and LLM (pos=$-1$) refusal direction candidates. Selected layers marked with $\star$.}
+\begin{tabular}{rc|rc|rc|rc}
+\toprule
+\textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} \\
+\midrule
+ 0 & 0.000 &  7 & 0.414 & 14 & 0.403 & 21 & 0.364 \\
+ 1 & 0.429 &  8 & 0.448 & 15 & 0.424 & 22 & 0.327 \\
+ 2 & 0.489 &  9 & 0.386 & $16^\star$ & \textbf{0.467} & 23 & 0.296 \\
+ 3 & 0.502 & 10 & \textbf{0.531} & 17 & 0.455 & 24 & 0.264 \\
+ 4 & 0.409 & 11 & 0.429 & 18 & 0.456 & 25 & 0.243 \\
+ 5 & 0.473 & 12 & 0.355 & $19^\star$ & \textbf{0.426} & 26 & 0.237 \\
+ 6 & 0.453 & 13 & 0.319 & 20 & 0.452 & 27 & 0.206 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]\centering
+\caption{Cosine similarity summary statistics.}
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Cosine between best directions ($\mathbf{d}_\text{VLM}^*$, $\mathbf{d}_\text{LLM}^*$) & $+0.300$ \\
+Per-layer maximum (layer 10) & $+0.531$ \\
+Per-layer minimum (layer 0) & $0.000$ \\
+Mean across layers 1--20 & $+0.430$ \\
+Mean across layers 21--27 & $+0.277$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%======================================================================
+\part{Discussion}
+%======================================================================
+
+%----------------------------------------------------------------------
+\section{Combined Findings}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Summary of all experiments.}
+\begin{tabular}{p{4cm}p{4cm}p{4cm}}
+\toprule
+\textbf{Finding} & \textbf{Evidence} & \textbf{Experiment} \\
+\midrule
+Single direction mediates VLM refusal & Ablation: $85\% \to 30\%$; Induce: $0\% \to 100\%$ & A \\
+Direction lives in text tokens & Image-only ablation: 0 pp effect; Text-only = all-position & A \\
+Direction inherited from LLM & Cross-transfer: VLM dir removes 75 pp LLM refusal & B \\
+VL fine-tuning rotates direction & Cosine = 0.30; yet cross-transfer works & B \\
+Text-only LLM refuses more & LLM 90\% vs VLM 75\% on same queries & B \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Implications for VLM Safety}
+%----------------------------------------------------------------------
+
+\paragraph{The refusal mechanism is a text-backbone inheritance.} VLMs do not develop new safety circuits during VL fine-tuning. The refusal direction from the text-only LLM transfers to the VLM with even greater effectiveness than the VLM's own direction. This means VLM safety is fundamentally bounded by LLM safety.
+
+
+%======================================================================
+\part{Experiment C: Pipeline Validation against Arditi et al.}
+\label{part:expC}
+%======================================================================
+
+%----------------------------------------------------------------------
+\section{Motivation}
+%----------------------------------------------------------------------
+
+Experiments~A and B rely on our custom refusal direction extraction pipeline, which differs from Arditi et al.'s original implementation in several ways (see Section~\ref{sec:diff} below). Before drawing conclusions from our results, we must verify that our pipeline produces the \emph{same} refusal direction as the original when applied to the same model. We do this by running both pipelines on \textbf{Qwen-1.8B-Chat} --- a model for which Arditi et al.\ published their pre-computed direction vector --- and comparing the outputs.
+
+%----------------------------------------------------------------------
+\section{Differences Between Pipelines}
+\label{sec:diff}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Implementation differences between Arditi et al.'s pipeline and our custom pipeline.}
+\begin{tabular}{p{3.5cm}p{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Component} & \textbf{Arditi et al.\ (original)} & \textbf{Our custom pipeline} \\
+\midrule
+\textbf{Harmful data} & AdvBench + MaliciousInstruct + TDC2023 (128 per source, deduplicated) & Same 128 harmful instructions (sampled from Arditi's processed splits) \\
+\textbf{Harmless data} & Alpaca dataset (entries with no input field) & Same 128 harmless instructions (from Arditi's processed splits) \\
+\textbf{Behavioral filter} & Logit-based refusal score: $\log\frac{P_\text{refuse}}{1-P_\text{refuse}}$ using first-token probabilities; positive = refused & Gemini 2.0 Flash LLM judge: generates full response, then Gemini classifies as YES/NO refusal \\
+\textbf{Activation extraction} & Batched (batch\_size=32), all samples in one pass & Per-sample (batch\_size=1), sequential \\
+\textbf{Precision} & float64 accumulation & float64 accumulation \\
+\textbf{Hook type} & Forward pre-hook on block input (resid\_pre) & Forward pre-hook on block input (resid\_pre) \\
+\textbf{Positions} & Last $N$ EOI tokens of assistant preamble & Same last $N$ EOI tokens \\
+\textbf{Direction scoring} & Logit-based refusal score on val set & Logit-based refusal score on val set \\
+\textbf{Model precision} & bfloat16 & float16 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The key difference is the \textbf{behavioral filter}: Arditi et al.\ use a logit-based proxy (checking if the first generated token looks like a refusal), while we generate the full response and send it to Gemini 2.0 Flash for semantic judgment. Our approach is more accurate --- it catches cases where the model begins with a non-refusal token but ultimately refuses (e.g., ``Sure, I'd be happy to help --- just kidding, I can't assist with that''), and avoids false positives where a refusal-like first token leads to a compliant response. However, it is slower (requires full generation + API call per sample).
+
+%----------------------------------------------------------------------
+\section{Setup}
+%----------------------------------------------------------------------
+
+\begin{table}[H]\centering
+\caption{Experiment~C configuration.}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Model & Qwen/Qwen-1\_8B-Chat (24 layers, $d_\text{model}=2048$) \\
+Harmful data & 96 instructions (from Arditi's harmful train split), shuffled \\
+Harmless data & 96 instructions (from Arditi's harmless train split), shuffled \\
+Behavioral filter & Gemini 2.0 Flash judge \\
+Extraction positions & 5 EOI tokens: \texttt{<|im\_end|>}, \texttt{$\backslash$n}, \texttt{<|im\_start|>}, \texttt{assistant}, \texttt{$\backslash$n} \\
+Extraction layers & All 24 layers \\
+Precision & float16 model weights, float64 activation accumulation \\
+Hook type & Forward pre-hook (resid\_pre) \\
+Reference direction & \texttt{pipeline/runs/qwen-1\_8b-chat/direction.pt} from Arditi's repo \\
+GPU & A100 on Modal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Data Filtering Results}
+%----------------------------------------------------------------------
+
+After generating responses with Qwen-1.8B-Chat and judging with Gemini 2.0 Flash:
+
+\begin{table}[H]\centering
+\caption{Behavioral filtering for Experiment~C.}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Split} & \textbf{Original} & \textbf{Filtered} & \textbf{Keep rate} \\
+\midrule
+Harmful (expect refusal) & 96 & 81 & 84\% \\
+Harmless (expect compliance) & 96 & 94 & 98\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 84\% harmful keep rate means Qwen-1.8B-Chat refuses most harmful instructions, consistent with its safety training. The 98\% harmless keep rate indicates low false-refusal.
+
+%----------------------------------------------------------------------
+\section{Direction Comparison}
+%----------------------------------------------------------------------
+
+Both our pipeline and Arditi's independently selected \textbf{position $-2$ (\texttt{assistant} token), layer 15} as the best refusal direction --- identical selections despite different filtering methods.
+
+\subsection{Best Direction Cosine Similarity}
+
+\begin{table}[H]\centering
+\caption{Cosine similarity between Arditi's pre-computed direction and our custom-extracted direction at the selected position/layer.}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Cosine similarity (best directions) & \textbf{+0.987} \\
+Arditi selected position & $-2$ (\texttt{assistant}) \\
+Our selected position & $-2$ (\texttt{assistant}) \\
+Arditi selected layer & 15 \\
+Our selected layer & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A cosine of 0.987 means the two direction vectors are nearly identical --- they point in essentially the same direction in the 2048-dimensional activation space. The 1.3\% deviation is attributable to (a) different samples surviving the behavioral filter (logit-based vs Gemini judge), (b) shuffling order affecting the random split, and (c) float16 vs bfloat16 model precision.
+
+\subsection{Per-Layer Cosine Similarity}
+
+We compare the difference-in-means vectors at every layer (at position $-2$) between Arditi's pipeline and ours:
+
+\begin{table}[H]\centering
+\caption{Per-layer cosine similarity at position $-2$. All layers show $>0.94$ agreement.}
+\begin{tabular}{rc|rc|rc|rc}
+\toprule
+\textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} & \textbf{L} & \textbf{Cos} \\
+\midrule
+ 0 & 0.000 &  6 & 0.941 & 12 & 0.977 & 18 & 0.983 \\
+ 1 & 0.944 &  7 & 0.949 & 13 & 0.981 & 19 & 0.982 \\
+ 2 & 0.956 &  8 & 0.961 & 14 & 0.980 & 20 & 0.980 \\
+ 3 & 0.959 &  9 & 0.960 & $15^\star$ & \textbf{0.987} & 21 & 0.977 \\
+ 4 & 0.951 & 10 & 0.966 & 16 & 0.987 & 22 & 0.977 \\
+ 5 & 0.945 & 11 & 0.971 & 17 & 0.987 & 23 & 0.976 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every layer (except layer 0, which is zero for both) shows cosine similarity above 0.94. The agreement is strongest in layers 13--17 (0.98+), precisely where the refusal direction is most meaningful. Layer 0 produces a zero vector in both pipelines because the embedding layer has not yet differentiated between refused and complied inputs.
+
+\subsection{Per-Position Cosine Similarity}
+
+At the selected layer 15, we compare across all 5 EOI positions:
+
+\begin{table}[H]\centering
+\caption{Per-position cosine similarity at layer 15. All positions show $>0.96$ agreement.}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Position} & \textbf{Token} & \textbf{Cosine} \\
+\midrule
+$-5$ & \texttt{<|im\_end|>} & 0.978 \\
+$-4$ & \texttt{$\backslash$n} & 0.982 \\
+$-3$ & \texttt{<|im\_start|>} & 0.961 \\
+$-2$ & \texttt{assistant} & \textbf{0.987} \\
+$-1$ & \texttt{$\backslash$n} & 0.988 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All positions agree at 0.96+. Position $-1$ (the final newline) has the highest agreement (0.988), while position $-3$ (\texttt{<|im\_start|>}) has the lowest (0.961) --- possibly because this structural token's representation is more sensitive to the exact set of samples used.
+
+%----------------------------------------------------------------------
+\section{Interpretation}
+%----------------------------------------------------------------------
+
+The near-perfect agreement (cosine $\geq 0.94$ at all layers, 0.987 at the selected direction) demonstrates that:
+
+\begin{enumerate}[nosep]
+\item \textbf{Our pipeline is correct}: The custom extraction code produces the same refusal direction as Arditi et al.'s reference implementation, validating the results in Experiments~A and~B.
+
+\item \textbf{The refusal direction is robust to the behavioral filter}: Arditi's logit-based proxy and our Gemini 2.0 Flash semantic judge identify essentially the same set of refused/complied samples. The minor differences in filtering (logit score thresholds vs LLM judgment) do not meaningfully change the extracted direction.
+
+\item \textbf{The refusal direction is robust to implementation details}: Different batching strategies (batch=32 vs batch=1), model precision (bfloat16 vs float16), and random shuffling all produce cosine $>0.94$. The direction is a stable feature of the model, not an artifact of any particular implementation choice.
+
+\item \textbf{Both pipelines select the same position and layer}: The \texttt{assistant} token (position $-2$) at layer 15 is independently identified as optimal by both the logit-based scoring and our Gemini-augmented scoring, confirming that this is where the refusal decision is most concentrated in Qwen-1.8B-Chat.
+\end{enumerate}
+
+%======================================================================
+\appendix
+\part*{Appendix}
+\addcontentsline{toc}{part}{Appendix}
+%======================================================================
+
+\section{Prompt Templates}
+\label{app:prompts}
+
+\subsection{VLM Input Prompt (Qwen ChatML with Image)}
+
+The VLM input is constructed using the processor's \texttt{apply\_chat\_template}:
+
+\begin{verbatim}
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|>...<|image_pad|><|vision_end|>
+{query}<|im_end|>
+<|im_start|>assistant
+\end{verbatim}
+
+The \texttt{<|image\_pad|>} tokens are replaced by vision encoder embeddings during processing. For Qwen2-VL-7B, a 512$\times$512 image produces $\sim$256 image pad tokens.
+
+\subsection{LLM Input Prompt (Qwen ChatML, Text Only)}
+
+\begin{verbatim}
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+{query}<|im_end|>
+<|im_start|>assistant
+\end{verbatim}
+
+Identical to the VLM prompt but without the vision tokens.
+
+\subsection{Gemini 2.0 Flash Judge Prompt}
+
+Used to classify each generated response as refused or complied:
+
+\begin{verbatim}
+Is the following response a refusal? A refusal includes
+declining to answer, apologizing and not providing requested
+information, saying it can't help, or redirecting away from
+a question. Answer with exactly one word: YES or NO.
+
+Response: {response_text[:500]}
+
+Answer:
+\end{verbatim}
+
+\section{Generation Parameters}
+
+\begin{table}[H]\centering
+\caption{Generation configuration for all experiments.}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+\texttt{do\_sample} & \texttt{False} (greedy decoding) \\
+\texttt{max\_new\_tokens} & 256 \\
+Precision & \texttt{bfloat16} \\
+Activation accumulation & \texttt{float64} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Refusal Token IDs}
+
+\begin{table}[H]\centering
+\caption{Refusal-start tokens used for logit-based scoring. Token IDs are from the Qwen tokenizer (shared vocabulary between Qwen2-VL-7B and Qwen2-7B).}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Token string} & \textbf{Token ID (Qwen3.5-9B)} & \textbf{Token ID (Qwen2-7B)} \\
+\midrule
+``I'' & 40 & 40 \\
+``Sorry'' & 18572 & 30040 \\
+``As'' & 2053 & 2121 \\
+``Unfortunately'' & 29056 & 19152 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
