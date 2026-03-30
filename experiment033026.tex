@@ -650,7 +650,7 @@ Text-only LLM refuses more & LLM 90\% vs VLM 75\% on same queries & B \\
 \section{Motivation}
 %----------------------------------------------------------------------
 
-Experiments~A and B rely on our custom refusal direction extraction pipeline, which differs from Arditi et al.'s original implementation in several ways (see Section~\ref{sec:diff} below). Before drawing conclusions from our results, we must verify that our pipeline produces the \emph{same} refusal direction as the original when applied to the same model. We do this by running both pipelines on \textbf{Qwen-1.8B-Chat} --- a model for which Arditi et al.\ published their pre-computed direction vector --- and comparing the outputs.
+Experiments~A and B rely on our custom refusal direction extraction pipeline, which differs from Arditi et al.'s original implementation in several ways (see Table~\ref{tab:pipeline_diff}). Before drawing conclusions from our results, we must verify that our pipeline produces the \emph{same} refusal direction as the original when applied to the same model. We do this by running both pipelines on \textbf{Qwen-1.8B-Chat} --- a model for which Arditi et al.\ published their pre-computed direction vector\footnote{\url{https://github.com/andyrdt/refusal_direction/blob/main/pipeline/runs/qwen-1_8b-chat/direction.pt}} --- and comparing the outputs.
 
 %----------------------------------------------------------------------
 \section{Differences Between Pipelines}
@@ -659,6 +659,7 @@ Experiments~A and B rely on our custom refusal direction extraction pipeline, wh
 
 \begin{table}[H]\centering
 \caption{Implementation differences between Arditi et al.'s pipeline and our custom pipeline.}
+\label{tab:pipeline_diff}
 \begin{tabular}{p{3.5cm}p{5.5cm}p{5.5cm}}
 \toprule
 \textbf{Component} & \textbf{Arditi et al.\ (original)} & \textbf{Our custom pipeline} \\
