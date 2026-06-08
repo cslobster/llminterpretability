@@ -1,0 +1,2114 @@
+{
+  "name": "SFW-300 control set (VLGuard safe_safes)",
+  "n": 300,
+  "source": {
+    "dataset": "VLGuard (Zong et al. 2024)",
+    "hf": "https://huggingface.co/datasets/ys-zong/VLGuard",
+    "paper": "https://arxiv.org/abs/2402.02207",
+    "access": "GATED on Hugging Face: accept the research-use agreement to fetch.",
+    "selection": "first 300 PNGs of the safe_safes (benign-image/benign-instruction) split, sorted by filename",
+    "note": "Image binaries are NOT rehosted here because VLGuard is access-gated; this manifest + sha256 prefixes let anyone with VLGuard access reproduce the exact set."
+  },
+  "files": [
+    {
+      "index": 0,
+      "filename": "00000.png",
+      "category": "safe_safes",
+      "sha256_16": "dea4c36a858b1c00",
+      "bytes": 47698
+    },
+    {
+      "index": 1,
+      "filename": "00001.png",
+      "category": "safe_safes",
+      "sha256_16": "e3f53b8803071679",
+      "bytes": 67317
+    },
+    {
+      "index": 2,
+      "filename": "00002.png",
+      "category": "safe_safes",
+      "sha256_16": "86f0a1c5f09a91e2",
+      "bytes": 85584
+    },
+    {
+      "index": 3,
+      "filename": "00003.png",
+      "category": "safe_safes",
+      "sha256_16": "a2327006d2076c08",
+      "bytes": 114034
+    },
+    {
+      "index": 4,
+      "filename": "00004.png",
+      "category": "safe_safes",
+      "sha256_16": "def9781bc2c127e6",
+      "bytes": 28080
+    },
+    {
+      "index": 5,
+      "filename": "00005.png",
+      "category": "safe_safes",
+      "sha256_16": "2fb3f5397ffa2cd6",
+      "bytes": 166234
+    },
+    {
+      "index": 6,
+      "filename": "00006.png",
+      "category": "safe_safes",
+      "sha256_16": "418bcae7d7e8db62",
+      "bytes": 130317
+    },
+    {
+      "index": 7,
+      "filename": "00007.png",
+      "category": "safe_safes",
+      "sha256_16": "ce250ef01efde01c",
+      "bytes": 185293
+    },
+    {
+      "index": 8,
+      "filename": "00008.png",
+      "category": "safe_safes",
+      "sha256_16": "892f9c809cec6e4a",
+      "bytes": 1060
+    },
+    {
+      "index": 9,
+      "filename": "00009.png",
+      "category": "safe_safes",
+      "sha256_16": "3c3b3c8dfc534828",
+      "bytes": 36072
+    },
+    {
+      "index": 10,
+      "filename": "00010.png",
+      "category": "safe_safes",
+      "sha256_16": "4430f2a5b0d0a3f5",
+      "bytes": 86007
+    },
+    {
+      "index": 11,
+      "filename": "00011.png",
+      "category": "safe_safes",
+      "sha256_16": "6a20b1cf1eaa48f0",
+      "bytes": 118178
+    },
+    {
+      "index": 12,
+      "filename": "00012.png",
+      "category": "safe_safes",
+      "sha256_16": "45369f6994709616",
+      "bytes": 43766
+    },
+    {
+      "index": 13,
+      "filename": "00013.png",
+      "category": "safe_safes",
+      "sha256_16": "faf0f2df24de2eb4",
+      "bytes": 13165
+    },
+    {
+      "index": 14,
+      "filename": "00014.png",
+      "category": "safe_safes",
+      "sha256_16": "70b44bc344df00a0",
+      "bytes": 74287
+    },
+    {
+      "index": 15,
+      "filename": "00015.png",
+      "category": "safe_safes",
+      "sha256_16": "7f748bb95be771e8",
+      "bytes": 198944
+    },
+    {
+      "index": 16,
+      "filename": "00016.png",
+      "category": "safe_safes",
+      "sha256_16": "6753a954f792dfec",
+      "bytes": 34860
+    },
+    {
+      "index": 17,
+      "filename": "00017.png",
+      "category": "safe_safes",
+      "sha256_16": "5b2e6f165a0b9838",
+      "bytes": 82627
+    },
+    {
+      "index": 18,
+      "filename": "00018.png",
+      "category": "safe_safes",
+      "sha256_16": "d6acac6c80291240",
+      "bytes": 69110
+    },
+    {
+      "index": 19,
+      "filename": "00019.png",
+      "category": "safe_safes",
+      "sha256_16": "0f6a2465dd7cbe37",
+      "bytes": 122780
+    },
+    {
+      "index": 20,
+      "filename": "00020.png",
+      "category": "safe_safes",
+      "sha256_16": "fd27706cce9788a0",
+      "bytes": 167505
+    },
+    {
+      "index": 21,
+      "filename": "00021.png",
+      "category": "safe_safes",
+      "sha256_16": "9f297f4c0de47e20",
+      "bytes": 53385
+    },
+    {
+      "index": 22,
+      "filename": "00022.png",
+      "category": "safe_safes",
+      "sha256_16": "e6e695f651583e95",
+      "bytes": 97236
+    },
+    {
+      "index": 23,
+      "filename": "00023.png",
+      "category": "safe_safes",
+      "sha256_16": "67fb9eda1f2ddb8f",
+      "bytes": 58420
+    },
+    {
+      "index": 24,
+      "filename": "00024.png",
+      "category": "safe_safes",
+      "sha256_16": "eba02d4f2fe3a01b",
+      "bytes": 131705
+    },
+    {
+      "index": 25,
+      "filename": "00025.png",
+      "category": "safe_safes",
+      "sha256_16": "01ce747c675a513a",
+      "bytes": 179930
+    },
+    {
+      "index": 26,
+      "filename": "00026.png",
+      "category": "safe_safes",
+      "sha256_16": "d2aecdc76c2fa502",
+      "bytes": 143542
+    },
+    {
+      "index": 27,
+      "filename": "00027.png",
+      "category": "safe_safes",
+      "sha256_16": "83474f2cfe96b2b0",
+      "bytes": 76949
+    },
+    {
+      "index": 28,
+      "filename": "00028.png",
+      "category": "safe_safes",
+      "sha256_16": "5ad4276dfb36dabd",
+      "bytes": 195452
+    },
+    {
+      "index": 29,
+      "filename": "00029.png",
+      "category": "safe_safes",
+      "sha256_16": "ef4fa64ef3fc083b",
+      "bytes": 56315
+    },
+    {
+      "index": 30,
+      "filename": "00030.png",
+      "category": "safe_safes",
+      "sha256_16": "67c6cba52b475372",
+      "bytes": 831
+    },
+    {
+      "index": 31,
+      "filename": "00031.png",
+      "category": "safe_safes",
+      "sha256_16": "4f827def1aa8632d",
+      "bytes": 45826
+    },
+    {
+      "index": 32,
+      "filename": "00032.png",
+      "category": "safe_safes",
+      "sha256_16": "ba8d41ffe6abad6a",
+      "bytes": 24404
+    },
+    {
+      "index": 33,
+      "filename": "00033.png",
+      "category": "safe_safes",
+      "sha256_16": "52f58df9f0da0505",
+      "bytes": 507461
+    },
+    {
+      "index": 34,
+      "filename": "00034.png",
+      "category": "safe_safes",
+      "sha256_16": "85a64e3696603abd",
+      "bytes": 57304
+    },
+    {
+      "index": 35,
+      "filename": "00035.png",
+      "category": "safe_safes",
+      "sha256_16": "d791f578e6b56abd",
+      "bytes": 49747
+    },
+    {
+      "index": 36,
+      "filename": "00036.png",
+      "category": "safe_safes",
+      "sha256_16": "c8a40844591b84b8",
+      "bytes": 834
+    },
+    {
+      "index": 37,
+      "filename": "00037.png",
+      "category": "safe_safes",
+      "sha256_16": "b6a54668eed92f40",
+      "bytes": 32187
+    },
+    {
+      "index": 38,
+      "filename": "00038.png",
+      "category": "safe_safes",
+      "sha256_16": "b69e59b37663c75c",
+      "bytes": 113997
+    },
+    {
+      "index": 39,
+      "filename": "00039.png",
+      "category": "safe_safes",
+      "sha256_16": "e7e83292bcf86333",
+      "bytes": 96841
+    },
+    {
+      "index": 40,
+      "filename": "00040.png",
+      "category": "safe_safes",
+      "sha256_16": "2d1ca0866cf95aae",
+      "bytes": 787
+    },
+    {
+      "index": 41,
+      "filename": "00041.png",
+      "category": "safe_safes",
+      "sha256_16": "38f4531851b06bf4",
+      "bytes": 356690
+    },
+    {
+      "index": 42,
+      "filename": "00042.png",
+      "category": "safe_safes",
+      "sha256_16": "34e1a4e029e954c5",
+      "bytes": 16115
+    },
+    {
+      "index": 43,
+      "filename": "00043.png",
+      "category": "safe_safes",
+      "sha256_16": "20890eec1c4f7641",
+      "bytes": 157999
+    },
+    {
+      "index": 44,
+      "filename": "00044.png",
+      "category": "safe_safes",
+      "sha256_16": "c0dca455a5c13ede",
+      "bytes": 46990
+    },
+    {
+      "index": 45,
+      "filename": "00045.png",
+      "category": "safe_safes",
+      "sha256_16": "255b7b27d2c20273",
+      "bytes": 133424
+    },
+    {
+      "index": 46,
+      "filename": "00046.png",
+      "category": "safe_safes",
+      "sha256_16": "e49158c896a1c3ab",
+      "bytes": 71559
+    },
+    {
+      "index": 47,
+      "filename": "00047.png",
+      "category": "safe_safes",
+      "sha256_16": "ae340c10c2df42e4",
+      "bytes": 18775
+    },
+    {
+      "index": 48,
+      "filename": "00048.png",
+      "category": "safe_safes",
+      "sha256_16": "4586d04902ca356b",
+      "bytes": 140851
+    },
+    {
+      "index": 49,
+      "filename": "00049.png",
+      "category": "safe_safes",
+      "sha256_16": "98ab818a493f58f5",
+      "bytes": 22031
+    },
+    {
+      "index": 50,
+      "filename": "00050.png",
+      "category": "safe_safes",
+      "sha256_16": "a488ffeae950c5be",
+      "bytes": 3394
+    },
+    {
+      "index": 51,
+      "filename": "00051.png",
+      "category": "safe_safes",
+      "sha256_16": "58dffd5973292627",
+      "bytes": 144195
+    },
+    {
+      "index": 52,
+      "filename": "00052.png",
+      "category": "safe_safes",
+      "sha256_16": "33e3dd0b8bdb034b",
+      "bytes": 115221
+    },
+    {
+      "index": 53,
+      "filename": "00053.png",
+      "category": "safe_safes",
+      "sha256_16": "8319828b4c53747b",
+      "bytes": 5931
+    },
+    {
+      "index": 54,
+      "filename": "00054.png",
+      "category": "safe_safes",
+      "sha256_16": "ba5d8640db52f520",
+      "bytes": 135276
+    },
+    {
+      "index": 55,
+      "filename": "00055.png",
+      "category": "safe_safes",
+      "sha256_16": "bfb49949339691c7",
+      "bytes": 95517
+    },
+    {
+      "index": 56,
+      "filename": "00056.png",
+      "category": "safe_safes",
+      "sha256_16": "d20e7200175d9cb0",
+      "bytes": 56126
+    },
+    {
+      "index": 57,
+      "filename": "00057.png",
+      "category": "safe_safes",
+      "sha256_16": "c9ce69a9eee6b26a",
+      "bytes": 115405
+    },
+    {
+      "index": 58,
+      "filename": "00058.png",
+      "category": "safe_safes",
+      "sha256_16": "a55e09c0f1f55af0",
+      "bytes": 199548
+    },
+    {
+      "index": 59,
+      "filename": "00059.png",
+      "category": "safe_safes",
+      "sha256_16": "e1cc52bd764846ac",
+      "bytes": 110463
+    },
+    {
+      "index": 60,
+      "filename": "00060.png",
+      "category": "safe_safes",
+      "sha256_16": "cdaf4885884e39a1",
+      "bytes": 23674
+    },
+    {
+      "index": 61,
+      "filename": "00061.png",
+      "category": "safe_safes",
+      "sha256_16": "863c65d4f5f099e9",
+      "bytes": 63200
+    },
+    {
+      "index": 62,
+      "filename": "00062.png",
+      "category": "safe_safes",
+      "sha256_16": "6a83fab30641f4f8",
+      "bytes": 586128
+    },
+    {
+      "index": 63,
+      "filename": "00063.png",
+      "category": "safe_safes",
+      "sha256_16": "1f42a149ef28e5b7",
+      "bytes": 753
+    },
+    {
+      "index": 64,
+      "filename": "00064.png",
+      "category": "safe_safes",
+      "sha256_16": "b27c4737638e755b",
+      "bytes": 742
+    },
+    {
+      "index": 65,
+      "filename": "00065.png",
+      "category": "safe_safes",
+      "sha256_16": "02a4cdbea14f373c",
+      "bytes": 171671
+    },
+    {
+      "index": 66,
+      "filename": "00066.png",
+      "category": "safe_safes",
+      "sha256_16": "55a5c65ed131982d",
+      "bytes": 32307
+    },
+    {
+      "index": 67,
+      "filename": "00067.png",
+      "category": "safe_safes",
+      "sha256_16": "704a1d2040a5f23a",
+      "bytes": 414026
+    },
+    {
+      "index": 68,
+      "filename": "00068.png",
+      "category": "safe_safes",
+      "sha256_16": "7057635b6f1b9d97",
+      "bytes": 1073
+    },
+    {
+      "index": 69,
+      "filename": "00069.png",
+      "category": "safe_safes",
+      "sha256_16": "74578b74ac893699",
+      "bytes": 66903
+    },
+    {
+      "index": 70,
+      "filename": "00070.png",
+      "category": "safe_safes",
+      "sha256_16": "d96c62636035ca13",
+      "bytes": 79762
+    },
+    {
+      "index": 71,
+      "filename": "00071.png",
+      "category": "safe_safes",
+      "sha256_16": "16f941ad6647103c",
+      "bytes": 48271
+    },
+    {
+      "index": 72,
+      "filename": "00072.png",
+      "category": "safe_safes",
+      "sha256_16": "32dd3eb94eb5ebb5",
+      "bytes": 2778
+    },
+    {
+      "index": 73,
+      "filename": "00073.png",
+      "category": "safe_safes",
+      "sha256_16": "e093c0a3dfd41504",
+      "bytes": 73797
+    },
+    {
+      "index": 74,
+      "filename": "00074.png",
+      "category": "safe_safes",
+      "sha256_16": "b0f7b7b501a92915",
+      "bytes": 174697
+    },
+    {
+      "index": 75,
+      "filename": "00075.png",
+      "category": "safe_safes",
+      "sha256_16": "77088fbc9d7c71b5",
+      "bytes": 81652
+    },
+    {
+      "index": 76,
+      "filename": "00076.png",
+      "category": "safe_safes",
+      "sha256_16": "7628db99d0741511",
+      "bytes": 199427
+    },
+    {
+      "index": 77,
+      "filename": "00077.png",
+      "category": "safe_safes",
+      "sha256_16": "a620e6cc530b3ddc",
+      "bytes": 107341
+    },
+    {
+      "index": 78,
+      "filename": "00078.png",
+      "category": "safe_safes",
+      "sha256_16": "5e6bbb8b40cc392a",
+      "bytes": 106755
+    },
+    {
+      "index": 79,
+      "filename": "00079.png",
+      "category": "safe_safes",
+      "sha256_16": "6d31f751ece748e7",
+      "bytes": 122565
+    },
+    {
+      "index": 80,
+      "filename": "00080.png",
+      "category": "safe_safes",
+      "sha256_16": "b321a16d3d595663",
+      "bytes": 200689
+    },
+    {
+      "index": 81,
+      "filename": "00081.png",
+      "category": "safe_safes",
+      "sha256_16": "fff21537a3945145",
+      "bytes": 51525
+    },
+    {
+      "index": 82,
+      "filename": "00082.png",
+      "category": "safe_safes",
+      "sha256_16": "49fcdcd297ecbeb8",
+      "bytes": 96642
+    },
+    {
+      "index": 83,
+      "filename": "00083.png",
+      "category": "safe_safes",
+      "sha256_16": "9f4072e0b1ade869",
+      "bytes": 19176
+    },
+    {
+      "index": 84,
+      "filename": "00084.png",
+      "category": "safe_safes",
+      "sha256_16": "a959b8be83f34a73",
+      "bytes": 160896
+    },
+    {
+      "index": 85,
+      "filename": "00085.png",
+      "category": "safe_safes",
+      "sha256_16": "327830715cf06889",
+      "bytes": 115882
+    },
+    {
+      "index": 86,
+      "filename": "00086.png",
+      "category": "safe_safes",
+      "sha256_16": "54c88bcc45f41419",
+      "bytes": 7657
+    },
+    {
+      "index": 87,
+      "filename": "00087.png",
+      "category": "safe_safes",
+      "sha256_16": "edf61b8052c5568e",
+      "bytes": 240484
+    },
+    {
+      "index": 88,
+      "filename": "00088.png",
+      "category": "safe_safes",
+      "sha256_16": "0fbde4a69e1ba16e",
+      "bytes": 116427
+    },
+    {
+      "index": 89,
+      "filename": "00089.png",
+      "category": "safe_safes",
+      "sha256_16": "ed409a41acfa4289",
+      "bytes": 98134
+    },
+    {
+      "index": 90,
+      "filename": "00090.png",
+      "category": "safe_safes",
+      "sha256_16": "161f5d1adf62aeb6",
+      "bytes": 42156
+    },
+    {
+      "index": 91,
+      "filename": "00091.png",
+      "category": "safe_safes",
+      "sha256_16": "3105ace51ed3d577",
+      "bytes": 84615
+    },
+    {
+      "index": 92,
+      "filename": "00092.png",
+      "category": "safe_safes",
+      "sha256_16": "c29c2cb5a7028735",
+      "bytes": 43773
+    },
+    {
+      "index": 93,
+      "filename": "00093.png",
+      "category": "safe_safes",
+      "sha256_16": "bd72e640d2269f17",
+      "bytes": 52758
+    },
+    {
+      "index": 94,
+      "filename": "00094.png",
+      "category": "safe_safes",
+      "sha256_16": "0e1bfed9f5c5ec54",
+      "bytes": 83800
+    },
+    {
+      "index": 95,
+      "filename": "00095.png",
+      "category": "safe_safes",
+      "sha256_16": "c8a40844591b84b8",
+      "bytes": 834
+    },
+    {
+      "index": 96,
+      "filename": "00096.png",
+      "category": "safe_safes",
+      "sha256_16": "e3457cfc3d732385",
+      "bytes": 227163
+    },
+    {
+      "index": 97,
+      "filename": "00097.png",
+      "category": "safe_safes",
+      "sha256_16": "804fa65f58dffba9",
+      "bytes": 45940
+    },
+    {
+      "index": 98,
+      "filename": "00098.png",
+      "category": "safe_safes",
+      "sha256_16": "a885c55523be0262",
+      "bytes": 57651
+    },
+    {
+      "index": 99,
+      "filename": "00099.png",
+      "category": "safe_safes",
+      "sha256_16": "bbf60143129a373e",
+      "bytes": 77576
+    },
+    {
+      "index": 100,
+      "filename": "00100.png",
+      "category": "safe_safes",
+      "sha256_16": "a9f1af82e540f8bd",
+      "bytes": 101673
+    },
+    {
+      "index": 101,
+      "filename": "00101.png",
+      "category": "safe_safes",
+      "sha256_16": "884464db9c7427bb",
+      "bytes": 100937
+    },
+    {
+      "index": 102,
+      "filename": "00102.png",
+      "category": "safe_safes",
+      "sha256_16": "812f5b594bd68844",
+      "bytes": 330108
+    },
+    {
+      "index": 103,
+      "filename": "00103.png",
+      "category": "safe_safes",
+      "sha256_16": "e408b1c02ab863c8",
+      "bytes": 154496
+    },
+    {
+      "index": 104,
+      "filename": "00104.png",
+      "category": "safe_safes",
+      "sha256_16": "747df2a0deb9f743",
+      "bytes": 163754
+    },
+    {
+      "index": 105,
+      "filename": "00105.png",
+      "category": "safe_safes",
+      "sha256_16": "ebe10d0c855d7d59",
+      "bytes": 116231
+    },
+    {
+      "index": 106,
+      "filename": "00106.png",
+      "category": "safe_safes",
+      "sha256_16": "4df6c79d10e0482d",
+      "bytes": 74884
+    },
+    {
+      "index": 107,
+      "filename": "00107.png",
+      "category": "safe_safes",
+      "sha256_16": "d986237c66e8c0fb",
+      "bytes": 483590
+    },
+    {
+      "index": 108,
+      "filename": "00108.png",
+      "category": "safe_safes",
+      "sha256_16": "b24b0d58685c5020",
+      "bytes": 282599
+    },
+    {
+      "index": 109,
+      "filename": "00109.png",
+      "category": "safe_safes",
+      "sha256_16": "ddaa273d6b6bd88e",
+      "bytes": 31736
+    },
+    {
+      "index": 110,
+      "filename": "00110.png",
+      "category": "safe_safes",
+      "sha256_16": "c89d118f03c6acca",
+      "bytes": 31332
+    },
+    {
+      "index": 111,
+      "filename": "00111.png",
+      "category": "safe_safes",
+      "sha256_16": "0fffcf41ce7fdb25",
+      "bytes": 198682
+    },
+    {
+      "index": 112,
+      "filename": "00112.png",
+      "category": "safe_safes",
+      "sha256_16": "9b9a3dc339edfeb4",
+      "bytes": 98641
+    },
+    {
+      "index": 113,
+      "filename": "00113.png",
+      "category": "safe_safes",
+      "sha256_16": "fc1584a26e0aa87f",
+      "bytes": 33655
+    },
+    {
+      "index": 114,
+      "filename": "00114.png",
+      "category": "safe_safes",
+      "sha256_16": "fb8f3a1ad8548e07",
+      "bytes": 128969
+    },
+    {
+      "index": 115,
+      "filename": "00115.png",
+      "category": "safe_safes",
+      "sha256_16": "0061374dc92e9e93",
+      "bytes": 94185
+    },
+    {
+      "index": 116,
+      "filename": "00116.png",
+      "category": "safe_safes",
+      "sha256_16": "5fb5f6d3a450cb85",
+      "bytes": 92413
+    },
+    {
+      "index": 117,
+      "filename": "00117.png",
+      "category": "safe_safes",
+      "sha256_16": "6d88c4fc833a7d36",
+      "bytes": 177038
+    },
+    {
+      "index": 118,
+      "filename": "00118.png",
+      "category": "safe_safes",
+      "sha256_16": "79e9d76642e743b4",
+      "bytes": 144676
+    },
+    {
+      "index": 119,
+      "filename": "00119.png",
+      "category": "safe_safes",
+      "sha256_16": "5f7321d06d180666",
+      "bytes": 76328
+    },
+    {
+      "index": 120,
+      "filename": "00120.png",
+      "category": "safe_safes",
+      "sha256_16": "922bbabd5d15e1ba",
+      "bytes": 18872
+    },
+    {
+      "index": 121,
+      "filename": "00121.png",
+      "category": "safe_safes",
+      "sha256_16": "6a042bacabadf3cd",
+      "bytes": 37778
+    },
+    {
+      "index": 122,
+      "filename": "00122.png",
+      "category": "safe_safes",
+      "sha256_16": "904d918d9b2f40b1",
+      "bytes": 246668
+    },
+    {
+      "index": 123,
+      "filename": "00123.png",
+      "category": "safe_safes",
+      "sha256_16": "53c02b6c770680fd",
+      "bytes": 366743
+    },
+    {
+      "index": 124,
+      "filename": "00124.png",
+      "category": "safe_safes",
+      "sha256_16": "e197cb61e9a098f1",
+      "bytes": 72827
+    },
+    {
+      "index": 125,
+      "filename": "00125.png",
+      "category": "safe_safes",
+      "sha256_16": "cae652ba490db2b6",
+      "bytes": 140489
+    },
+    {
+      "index": 126,
+      "filename": "00126.png",
+      "category": "safe_safes",
+      "sha256_16": "aa931a16d63e5af0",
+      "bytes": 261396
+    },
+    {
+      "index": 127,
+      "filename": "00127.png",
+      "category": "safe_safes",
+      "sha256_16": "d9135b618e7bedee",
+      "bytes": 219390
+    },
+    {
+      "index": 128,
+      "filename": "00128.png",
+      "category": "safe_safes",
+      "sha256_16": "2f5eae21866a1468",
+      "bytes": 305786
+    },
+    {
+      "index": 129,
+      "filename": "00129.png",
+      "category": "safe_safes",
+      "sha256_16": "9be3149c792dc5bf",
+      "bytes": 510593
+    },
+    {
+      "index": 130,
+      "filename": "00130.png",
+      "category": "safe_safes",
+      "sha256_16": "83312fd097e6f759",
+      "bytes": 82577
+    },
+    {
+      "index": 131,
+      "filename": "00131.png",
+      "category": "safe_safes",
+      "sha256_16": "899539e6abddea2b",
+      "bytes": 196357
+    },
+    {
+      "index": 132,
+      "filename": "00132.png",
+      "category": "safe_safes",
+      "sha256_16": "17b44903656247ec",
+      "bytes": 231907
+    },
+    {
+      "index": 133,
+      "filename": "00133.png",
+      "category": "safe_safes",
+      "sha256_16": "8e525ecc6e5eaef1",
+      "bytes": 280434
+    },
+    {
+      "index": 134,
+      "filename": "00134.png",
+      "category": "safe_safes",
+      "sha256_16": "6ff377c57d5e94f8",
+      "bytes": 277820
+    },
+    {
+      "index": 135,
+      "filename": "00135.png",
+      "category": "safe_safes",
+      "sha256_16": "f504f539d6882946",
+      "bytes": 665220
+    },
+    {
+      "index": 136,
+      "filename": "00136.png",
+      "category": "safe_safes",
+      "sha256_16": "64a99803d95e4aab",
+      "bytes": 361926
+    },
+    {
+      "index": 137,
+      "filename": "00137.png",
+      "category": "safe_safes",
+      "sha256_16": "5d1d0e43bae64aa4",
+      "bytes": 352080
+    },
+    {
+      "index": 138,
+      "filename": "00138.png",
+      "category": "safe_safes",
+      "sha256_16": "f41485056d0e3365",
+      "bytes": 275102
+    },
+    {
+      "index": 139,
+      "filename": "00139.png",
+      "category": "safe_safes",
+      "sha256_16": "91e461a876c26396",
+      "bytes": 299517
+    },
+    {
+      "index": 140,
+      "filename": "00140.png",
+      "category": "safe_safes",
+      "sha256_16": "4930a9739ad158ac",
+      "bytes": 166008
+    },
+    {
+      "index": 141,
+      "filename": "00141.png",
+      "category": "safe_safes",
+      "sha256_16": "9c05078d3be3d77f",
+      "bytes": 240734
+    },
+    {
+      "index": 142,
+      "filename": "00142.png",
+      "category": "safe_safes",
+      "sha256_16": "fa6b7574d3af7ee2",
+      "bytes": 300206
+    },
+    {
+      "index": 143,
+      "filename": "00143.png",
+      "category": "safe_safes",
+      "sha256_16": "b50c626914016419",
+      "bytes": 275597
+    },
+    {
+      "index": 144,
+      "filename": "00144.png",
+      "category": "safe_safes",
+      "sha256_16": "bfb256ff50db57f1",
+      "bytes": 872953
+    },
+    {
+      "index": 145,
+      "filename": "00145.png",
+      "category": "safe_safes",
+      "sha256_16": "9cccdb2554cb8091",
+      "bytes": 382620
+    },
+    {
+      "index": 146,
+      "filename": "00146.png",
+      "category": "safe_safes",
+      "sha256_16": "a21aef1a5452e4c4",
+      "bytes": 315329
+    },
+    {
+      "index": 147,
+      "filename": "00147.png",
+      "category": "safe_safes",
+      "sha256_16": "a439383f23e35b5a",
+      "bytes": 130812
+    },
+    {
+      "index": 148,
+      "filename": "00148.png",
+      "category": "safe_safes",
+      "sha256_16": "f83a04f10e22ce26",
+      "bytes": 245013
+    },
+    {
+      "index": 149,
+      "filename": "00149.png",
+      "category": "safe_safes",
+      "sha256_16": "9cfc31d48f68a8d2",
+      "bytes": 171876
+    },
+    {
+      "index": 150,
+      "filename": "00150.png",
+      "category": "safe_safes",
+      "sha256_16": "06af22de9c9e3320",
+      "bytes": 193667
+    },
+    {
+      "index": 151,
+      "filename": "00151.png",
+      "category": "safe_safes",
+      "sha256_16": "b3625347359b2c9f",
+      "bytes": 210127
+    },
+    {
+      "index": 152,
+      "filename": "00152.png",
+      "category": "safe_safes",
+      "sha256_16": "d08a8a0f8da621ed",
+      "bytes": 222879
+    },
+    {
+      "index": 153,
+      "filename": "00153.png",
+      "category": "safe_safes",
+      "sha256_16": "3134ad74eb2fa641",
+      "bytes": 527040
+    },
+    {
+      "index": 154,
+      "filename": "00154.png",
+      "category": "safe_safes",
+      "sha256_16": "e8fa4c087e6a1241",
+      "bytes": 389793
+    },
+    {
+      "index": 155,
+      "filename": "00155.png",
+      "category": "safe_safes",
+      "sha256_16": "6558ebf70ad42001",
+      "bytes": 713790
+    },
+    {
+      "index": 156,
+      "filename": "00156.png",
+      "category": "safe_safes",
+      "sha256_16": "6fed7d83362e0d9a",
+      "bytes": 228142
+    },
+    {
+      "index": 157,
+      "filename": "00157.png",
+      "category": "safe_safes",
+      "sha256_16": "632b1609a0ad5f48",
+      "bytes": 252378
+    },
+    {
+      "index": 158,
+      "filename": "00158.png",
+      "category": "safe_safes",
+      "sha256_16": "201530ce7888da3e",
+      "bytes": 298119
+    },
+    {
+      "index": 159,
+      "filename": "00159.png",
+      "category": "safe_safes",
+      "sha256_16": "a67fb952382dc27c",
+      "bytes": 380270
+    },
+    {
+      "index": 160,
+      "filename": "00160.png",
+      "category": "safe_safes",
+      "sha256_16": "0bac1b2833ef067c",
+      "bytes": 167958
+    },
+    {
+      "index": 161,
+      "filename": "00161.png",
+      "category": "safe_safes",
+      "sha256_16": "f77264384d4b6dac",
+      "bytes": 296982
+    },
+    {
+      "index": 162,
+      "filename": "00162.png",
+      "category": "safe_safes",
+      "sha256_16": "2328c850e86928a9",
+      "bytes": 151883
+    },
+    {
+      "index": 163,
+      "filename": "00163.png",
+      "category": "safe_safes",
+      "sha256_16": "a60aa223226b57ca",
+      "bytes": 332103
+    },
+    {
+      "index": 164,
+      "filename": "00164.png",
+      "category": "safe_safes",
+      "sha256_16": "4e8f8cf8bc7d4893",
+      "bytes": 225377
+    },
+    {
+      "index": 165,
+      "filename": "00165.png",
+      "category": "safe_safes",
+      "sha256_16": "f869baf467f26412",
+      "bytes": 219538
+    },
+    {
+      "index": 166,
+      "filename": "00166.png",
+      "category": "safe_safes",
+      "sha256_16": "7a88fb307987a568",
+      "bytes": 1170198
+    },
+    {
+      "index": 167,
+      "filename": "00167.png",
+      "category": "safe_safes",
+      "sha256_16": "bc5f976ddbd07fd8",
+      "bytes": 280831
+    },
+    {
+      "index": 168,
+      "filename": "00168.png",
+      "category": "safe_safes",
+      "sha256_16": "b46eca47a5934516",
+      "bytes": 261531
+    },
+    {
+      "index": 169,
+      "filename": "00169.png",
+      "category": "safe_safes",
+      "sha256_16": "23f76d1662849c9c",
+      "bytes": 163603
+    },
+    {
+      "index": 170,
+      "filename": "00170.png",
+      "category": "safe_safes",
+      "sha256_16": "d6bda6c1fe05cec7",
+      "bytes": 306202
+    },
+    {
+      "index": 171,
+      "filename": "00171.png",
+      "category": "safe_safes",
+      "sha256_16": "869590393c2e1b19",
+      "bytes": 115469
+    },
+    {
+      "index": 172,
+      "filename": "00172.png",
+      "category": "safe_safes",
+      "sha256_16": "1233642f8de7b4e5",
+      "bytes": 226569
+    },
+    {
+      "index": 173,
+      "filename": "00173.png",
+      "category": "safe_safes",
+      "sha256_16": "3e85195c07f401f3",
+      "bytes": 714756
+    },
+    {
+      "index": 174,
+      "filename": "00174.png",
+      "category": "safe_safes",
+      "sha256_16": "55b8c4beb62d10ac",
+      "bytes": 180330
+    },
+    {
+      "index": 175,
+      "filename": "00175.png",
+      "category": "safe_safes",
+      "sha256_16": "da8f93d8bf050685",
+      "bytes": 234371
+    },
+    {
+      "index": 176,
+      "filename": "00176.png",
+      "category": "safe_safes",
+      "sha256_16": "efddf1112d559412",
+      "bytes": 298475
+    },
+    {
+      "index": 177,
+      "filename": "00177.png",
+      "category": "safe_safes",
+      "sha256_16": "749daf4b9e5c8d9b",
+      "bytes": 207275
+    },
+    {
+      "index": 178,
+      "filename": "00178.png",
+      "category": "safe_safes",
+      "sha256_16": "3df7a83c3da1230a",
+      "bytes": 84705
+    },
+    {
+      "index": 179,
+      "filename": "00179.png",
+      "category": "safe_safes",
+      "sha256_16": "ac2404680804c5fb",
+      "bytes": 203809
+    },
+    {
+      "index": 180,
+      "filename": "00180.png",
+      "category": "safe_safes",
+      "sha256_16": "576151cea0a9d9ee",
+      "bytes": 44845
+    },
+    {
+      "index": 181,
+      "filename": "00181.png",
+      "category": "safe_safes",
+      "sha256_16": "8bd601f9ac1accfe",
+      "bytes": 136638
+    },
+    {
+      "index": 182,
+      "filename": "00182.png",
+      "category": "safe_safes",
+      "sha256_16": "bfc42c41b0f27b48",
+      "bytes": 226300
+    },
+    {
+      "index": 183,
+      "filename": "00183.png",
+      "category": "safe_safes",
+      "sha256_16": "a82890bcc2dd1573",
+      "bytes": 171569
+    },
+    {
+      "index": 184,
+      "filename": "00184.png",
+      "category": "safe_safes",
+      "sha256_16": "8bfb9979077ce542",
+      "bytes": 2162049
+    },
+    {
+      "index": 185,
+      "filename": "00185.png",
+      "category": "safe_safes",
+      "sha256_16": "5309de753154714d",
+      "bytes": 258454
+    },
+    {
+      "index": 186,
+      "filename": "00186.png",
+      "category": "safe_safes",
+      "sha256_16": "9f28f8d1d415b7fa",
+      "bytes": 420146
+    },
+    {
+      "index": 187,
+      "filename": "00187.png",
+      "category": "safe_safes",
+      "sha256_16": "ccdb0a12d4501e2a",
+      "bytes": 196553
+    },
+    {
+      "index": 188,
+      "filename": "00188.png",
+      "category": "safe_safes",
+      "sha256_16": "a50dcd8b06865bc0",
+      "bytes": 386169
+    },
+    {
+      "index": 189,
+      "filename": "00189.png",
+      "category": "safe_safes",
+      "sha256_16": "0f622e4c53d26292",
+      "bytes": 276501
+    },
+    {
+      "index": 190,
+      "filename": "00190.png",
+      "category": "safe_safes",
+      "sha256_16": "8d2387d94891c781",
+      "bytes": 260977
+    },
+    {
+      "index": 191,
+      "filename": "00191.png",
+      "category": "safe_safes",
+      "sha256_16": "c4087ee987a350cd",
+      "bytes": 680643
+    },
+    {
+      "index": 192,
+      "filename": "00192.png",
+      "category": "safe_safes",
+      "sha256_16": "2609620834d7a209",
+      "bytes": 162746
+    },
+    {
+      "index": 193,
+      "filename": "00193.png",
+      "category": "safe_safes",
+      "sha256_16": "f91cd8423143cb58",
+      "bytes": 295424
+    },
+    {
+      "index": 194,
+      "filename": "00194.png",
+      "category": "safe_safes",
+      "sha256_16": "9893032930ab7cbb",
+      "bytes": 365692
+    },
+    {
+      "index": 195,
+      "filename": "00195.png",
+      "category": "safe_safes",
+      "sha256_16": "5b3378b749bb4a27",
+      "bytes": 123776
+    },
+    {
+      "index": 196,
+      "filename": "00196.png",
+      "category": "safe_safes",
+      "sha256_16": "135a77f0fa3a4361",
+      "bytes": 91433
+    },
+    {
+      "index": 197,
+      "filename": "00197.png",
+      "category": "safe_safes",
+      "sha256_16": "6374f7298510ec5f",
+      "bytes": 91309
+    },
+    {
+      "index": 198,
+      "filename": "00198.png",
+      "category": "safe_safes",
+      "sha256_16": "83347ed4a762c9b7",
+      "bytes": 141889
+    },
+    {
+      "index": 199,
+      "filename": "00199.png",
+      "category": "safe_safes",
+      "sha256_16": "9ce5e4ce68dc8d46",
+      "bytes": 327622
+    },
+    {
+      "index": 200,
+      "filename": "00200.png",
+      "category": "safe_safes",
+      "sha256_16": "5ee25bcc815424fe",
+      "bytes": 182268
+    },
+    {
+      "index": 201,
+      "filename": "00201.png",
+      "category": "safe_safes",
+      "sha256_16": "ade9f9c6e0785f6c",
+      "bytes": 134908
+    },
+    {
+      "index": 202,
+      "filename": "00202.png",
+      "category": "safe_safes",
+      "sha256_16": "3459fb802e2b635f",
+      "bytes": 135254
+    },
+    {
+      "index": 203,
+      "filename": "00203.png",
+      "category": "safe_safes",
+      "sha256_16": "49240ee38743ee2c",
+      "bytes": 235953
+    },
+    {
+      "index": 204,
+      "filename": "00204.png",
+      "category": "safe_safes",
+      "sha256_16": "30daa859131c32e6",
+      "bytes": 137294
+    },
+    {
+      "index": 205,
+      "filename": "00205.png",
+      "category": "safe_safes",
+      "sha256_16": "2a48e0a17fa925c9",
+      "bytes": 158740
+    },
+    {
+      "index": 206,
+      "filename": "00206.png",
+      "category": "safe_safes",
+      "sha256_16": "397a1c9f707875ad",
+      "bytes": 255536
+    },
+    {
+      "index": 207,
+      "filename": "00207.png",
+      "category": "safe_safes",
+      "sha256_16": "b70a59df9c359e4e",
+      "bytes": 128342
+    },
+    {
+      "index": 208,
+      "filename": "00208.png",
+      "category": "safe_safes",
+      "sha256_16": "d157f8dc9ffac11d",
+      "bytes": 100000
+    },
+    {
+      "index": 209,
+      "filename": "00209.png",
+      "category": "safe_safes",
+      "sha256_16": "0966db9a08d83932",
+      "bytes": 171922
+    },
+    {
+      "index": 210,
+      "filename": "00210.png",
+      "category": "safe_safes",
+      "sha256_16": "2befe14e43d492fb",
+      "bytes": 225300
+    },
+    {
+      "index": 211,
+      "filename": "00211.png",
+      "category": "safe_safes",
+      "sha256_16": "a4ee2a2f7062c9e3",
+      "bytes": 189164
+    },
+    {
+      "index": 212,
+      "filename": "00212.png",
+      "category": "safe_safes",
+      "sha256_16": "9f216fed382df426",
+      "bytes": 505038
+    },
+    {
+      "index": 213,
+      "filename": "00213.png",
+      "category": "safe_safes",
+      "sha256_16": "d9e49da81ed9ea6b",
+      "bytes": 410157
+    },
+    {
+      "index": 214,
+      "filename": "00214.png",
+      "category": "safe_safes",
+      "sha256_16": "8fb9fb60c9c7675d",
+      "bytes": 172066
+    },
+    {
+      "index": 215,
+      "filename": "00215.png",
+      "category": "safe_safes",
+      "sha256_16": "4553e7464f33b069",
+      "bytes": 207668
+    },
+    {
+      "index": 216,
+      "filename": "00216.png",
+      "category": "safe_safes",
+      "sha256_16": "f3babc3cc185f502",
+      "bytes": 226636
+    },
+    {
+      "index": 217,
+      "filename": "00217.png",
+      "category": "safe_safes",
+      "sha256_16": "32824b63cc434311",
+      "bytes": 138236
+    },
+    {
+      "index": 218,
+      "filename": "00218.png",
+      "category": "safe_safes",
+      "sha256_16": "0af219bfa4f19e15",
+      "bytes": 253420
+    },
+    {
+      "index": 219,
+      "filename": "00219.png",
+      "category": "safe_safes",
+      "sha256_16": "eacffe81d1c0fff9",
+      "bytes": 4110102
+    },
+    {
+      "index": 220,
+      "filename": "00220.png",
+      "category": "safe_safes",
+      "sha256_16": "4d0b4dc6b7c59047",
+      "bytes": 284877
+    },
+    {
+      "index": 221,
+      "filename": "00221.png",
+      "category": "safe_safes",
+      "sha256_16": "079c96baf4bd8ebf",
+      "bytes": 1462769
+    },
+    {
+      "index": 222,
+      "filename": "00222.png",
+      "category": "safe_safes",
+      "sha256_16": "e80620a65003b5f5",
+      "bytes": 462992
+    },
+    {
+      "index": 223,
+      "filename": "00223.png",
+      "category": "safe_safes",
+      "sha256_16": "665803e57dca6820",
+      "bytes": 1386440
+    },
+    {
+      "index": 224,
+      "filename": "00224.png",
+      "category": "safe_safes",
+      "sha256_16": "3d945a8db063c6ec",
+      "bytes": 141019
+    },
+    {
+      "index": 225,
+      "filename": "00225.png",
+      "category": "safe_safes",
+      "sha256_16": "eacf4bfa4e910e38",
+      "bytes": 987249
+    },
+    {
+      "index": 226,
+      "filename": "00226.png",
+      "category": "safe_safes",
+      "sha256_16": "04e842790429fb4a",
+      "bytes": 2968
+    },
+    {
+      "index": 227,
+      "filename": "00227.png",
+      "category": "safe_safes",
+      "sha256_16": "824f37f418f6f5a7",
+      "bytes": 242782
+    },
+    {
+      "index": 228,
+      "filename": "00228.png",
+      "category": "safe_safes",
+      "sha256_16": "059ae341bf809985",
+      "bytes": 222238
+    },
+    {
+      "index": 229,
+      "filename": "00229.png",
+      "category": "safe_safes",
+      "sha256_16": "9f4516f24a7d896f",
+      "bytes": 224725
+    },
+    {
+      "index": 230,
+      "filename": "00230.png",
+      "category": "safe_safes",
+      "sha256_16": "128afff2e6b168c0",
+      "bytes": 800190
+    },
+    {
+      "index": 231,
+      "filename": "00231.png",
+      "category": "safe_safes",
+      "sha256_16": "932c869ca87e8326",
+      "bytes": 2149102
+    },
+    {
+      "index": 232,
+      "filename": "00232.png",
+      "category": "safe_safes",
+      "sha256_16": "2c8e385b410d397a",
+      "bytes": 228278
+    },
+    {
+      "index": 233,
+      "filename": "00233.png",
+      "category": "safe_safes",
+      "sha256_16": "e68a9341c55b8f86",
+      "bytes": 323158
+    },
+    {
+      "index": 234,
+      "filename": "00234.png",
+      "category": "safe_safes",
+      "sha256_16": "18b124825050fc4a",
+      "bytes": 375517
+    },
+    {
+      "index": 235,
+      "filename": "00235.png",
+      "category": "safe_safes",
+      "sha256_16": "74129f79e660dd5f",
+      "bytes": 512027
+    },
+    {
+      "index": 236,
+      "filename": "00236.png",
+      "category": "safe_safes",
+      "sha256_16": "9ca3ac5f5c83fccb",
+      "bytes": 50476
+    },
+    {
+      "index": 237,
+      "filename": "00237.png",
+      "category": "safe_safes",
+      "sha256_16": "978f587a777e47d7",
+      "bytes": 72720
+    },
+    {
+      "index": 238,
+      "filename": "00238.png",
+      "category": "safe_safes",
+      "sha256_16": "c05ce2cbe6d5062d",
+      "bytes": 333622
+    },
+    {
+      "index": 239,
+      "filename": "00239.png",
+      "category": "safe_safes",
+      "sha256_16": "28788e9d751a83a2",
+      "bytes": 129015
+    },
+    {
+      "index": 240,
+      "filename": "00240.png",
+      "category": "safe_safes",
+      "sha256_16": "09abf5ca96e5166c",
+      "bytes": 207451
+    },
+    {
+      "index": 241,
+      "filename": "00241.png",
+      "category": "safe_safes",
+      "sha256_16": "ac7419b370ec398e",
+      "bytes": 227472
+    },
+    {
+      "index": 242,
+      "filename": "00242.png",
+      "category": "safe_safes",
+      "sha256_16": "faf0b80d2ca2d489",
+      "bytes": 237418
+    },
+    {
+      "index": 243,
+      "filename": "00243.png",
+      "category": "safe_safes",
+      "sha256_16": "03cc1302d9d40d1e",
+      "bytes": 301061
+    },
+    {
+      "index": 244,
+      "filename": "00244.png",
+      "category": "safe_safes",
+      "sha256_16": "c26beff06498edb1",
+      "bytes": 580248
+    },
+    {
+      "index": 245,
+      "filename": "00245.png",
+      "category": "safe_safes",
+      "sha256_16": "128b769e1ca00af6",
+      "bytes": 311759
+    },
+    {
+      "index": 246,
+      "filename": "00246.png",
+      "category": "safe_safes",
+      "sha256_16": "dbd5535ef193e7e2",
+      "bytes": 166184
+    },
+    {
+      "index": 247,
+      "filename": "00247.png",
+      "category": "safe_safes",
+      "sha256_16": "9d37ed97206aaa08",
+      "bytes": 601790
+    },
+    {
+      "index": 248,
+      "filename": "00248.png",
+      "category": "safe_safes",
+      "sha256_16": "5c02ead847ee74d0",
+      "bytes": 309945
+    },
+    {
+      "index": 249,
+      "filename": "00249.png",
+      "category": "safe_safes",
+      "sha256_16": "ab89a39ba6ab3782",
+      "bytes": 320761
+    },
+    {
+      "index": 250,
+      "filename": "00250.png",
+      "category": "safe_safes",
+      "sha256_16": "deed3971587037f8",
+      "bytes": 262011
+    },
+    {
+      "index": 251,
+      "filename": "00251.png",
+      "category": "safe_safes",
+      "sha256_16": "a61c54597fd388b8",
+      "bytes": 531686
+    },
+    {
+      "index": 252,
+      "filename": "00252.png",
+      "category": "safe_safes",
+      "sha256_16": "b339d5ef7ec8c746",
+      "bytes": 142656
+    },
+    {
+      "index": 253,
+      "filename": "00253.png",
+      "category": "safe_safes",
+      "sha256_16": "c16551c7189645e4",
+      "bytes": 129808
+    },
+    {
+      "index": 254,
+      "filename": "00254.png",
+      "category": "safe_safes",
+      "sha256_16": "823459d7964abea9",
+      "bytes": 230851
+    },
+    {
+      "index": 255,
+      "filename": "00255.png",
+      "category": "safe_safes",
+      "sha256_16": "c4324733cde9864b",
+      "bytes": 782393
+    },
+    {
+      "index": 256,
+      "filename": "00256.png",
+      "category": "safe_safes",
+      "sha256_16": "99debc2932b68302",
+      "bytes": 165743
+    },
+    {
+      "index": 257,
+      "filename": "00257.png",
+      "category": "safe_safes",
+      "sha256_16": "efa681aa19946fa5",
+      "bytes": 177991
+    },
+    {
+      "index": 258,
+      "filename": "00258.png",
+      "category": "safe_safes",
+      "sha256_16": "d9c2462fcabbabe8",
+      "bytes": 218628
+    },
+    {
+      "index": 259,
+      "filename": "00259.png",
+      "category": "safe_safes",
+      "sha256_16": "b57540ab6100a9b6",
+      "bytes": 664944
+    },
+    {
+      "index": 260,
+      "filename": "00260.png",
+      "category": "safe_safes",
+      "sha256_16": "6876a13757eefb7e",
+      "bytes": 319373
+    },
+    {
+      "index": 261,
+      "filename": "00261.png",
+      "category": "safe_safes",
+      "sha256_16": "580edce9c5a96ac8",
+      "bytes": 234744
+    },
+    {
+      "index": 262,
+      "filename": "00262.png",
+      "category": "safe_safes",
+      "sha256_16": "899897fca35cd2e0",
+      "bytes": 298155
+    },
+    {
+      "index": 263,
+      "filename": "00263.png",
+      "category": "safe_safes",
+      "sha256_16": "60ab981d236800ac",
+      "bytes": 187182
+    },
+    {
+      "index": 264,
+      "filename": "00264.png",
+      "category": "safe_safes",
+      "sha256_16": "ed7fd87d5b8b6a02",
+      "bytes": 244140
+    },
+    {
+      "index": 265,
+      "filename": "00265.png",
+      "category": "safe_safes",
+      "sha256_16": "d47e33f93bd403f0",
+      "bytes": 126589
+    },
+    {
+      "index": 266,
+      "filename": "00266.png",
+      "category": "safe_safes",
+      "sha256_16": "6a2702a608cb1bb6",
+      "bytes": 396937
+    },
+    {
+      "index": 267,
+      "filename": "00267.png",
+      "category": "safe_safes",
+      "sha256_16": "6910235f95793461",
+      "bytes": 588631
+    },
+    {
+      "index": 268,
+      "filename": "00268.png",
+      "category": "safe_safes",
+      "sha256_16": "a0adb7da56b157d8",
+      "bytes": 760081
+    },
+    {
+      "index": 269,
+      "filename": "00269.png",
+      "category": "safe_safes",
+      "sha256_16": "9f1481ed6ed740e8",
+      "bytes": 351371
+    },
+    {
+      "index": 270,
+      "filename": "00270.png",
+      "category": "safe_safes",
+      "sha256_16": "37c29ec7b0d66bd6",
+      "bytes": 659937
+    },
+    {
+      "index": 271,
+      "filename": "00271.png",
+      "category": "safe_safes",
+      "sha256_16": "38b0619b3fa468d9",
+      "bytes": 201395
+    },
+    {
+      "index": 272,
+      "filename": "00272.png",
+      "category": "safe_safes",
+      "sha256_16": "3385a994c831570f",
+      "bytes": 294063
+    },
+    {
+      "index": 273,
+      "filename": "00273.png",
+      "category": "safe_safes",
+      "sha256_16": "dfdb79021a62e583",
+      "bytes": 216678
+    },
+    {
+      "index": 274,
+      "filename": "00274.png",
+      "category": "safe_safes",
+      "sha256_16": "5d6c7243c9c9b569",
+      "bytes": 337063
+    },
+    {
+      "index": 275,
+      "filename": "00275.png",
+      "category": "safe_safes",
+      "sha256_16": "7c97703924ad584b",
+      "bytes": 214980
+    },
+    {
+      "index": 276,
+      "filename": "00276.png",
+      "category": "safe_safes",
+      "sha256_16": "fd3faa56cd92c26f",
+      "bytes": 196569
+    },
+    {
+      "index": 277,
+      "filename": "00277.png",
+      "category": "safe_safes",
+      "sha256_16": "1204f2b0bce4643a",
+      "bytes": 379172
+    },
+    {
+      "index": 278,
+      "filename": "00278.png",
+      "category": "safe_safes",
+      "sha256_16": "3384118d613d8279",
+      "bytes": 305676
+    },
+    {
+      "index": 279,
+      "filename": "00279.png",
+      "category": "safe_safes",
+      "sha256_16": "afb95ef76571c483",
+      "bytes": 694836
+    },
+    {
+      "index": 280,
+      "filename": "00280.png",
+      "category": "safe_safes",
+      "sha256_16": "5b01f1072f17d987",
+      "bytes": 243788
+    },
+    {
+      "index": 281,
+      "filename": "00281.png",
+      "category": "safe_safes",
+      "sha256_16": "f6076fbc6c0e36aa",
+      "bytes": 146486
+    },
+    {
+      "index": 282,
+      "filename": "00282.png",
+      "category": "safe_safes",
+      "sha256_16": "e181e47dfeee7799",
+      "bytes": 263999
+    },
+    {
+      "index": 283,
+      "filename": "00283.png",
+      "category": "safe_safes",
+      "sha256_16": "6355f9041c837bf3",
+      "bytes": 506299
+    },
+    {
+      "index": 284,
+      "filename": "00284.png",
+      "category": "safe_safes",
+      "sha256_16": "ea84d7e2b33ff219",
+      "bytes": 440580
+    },
+    {
+      "index": 285,
+      "filename": "00285.png",
+      "category": "safe_safes",
+      "sha256_16": "bd431f790f669bf2",
+      "bytes": 81362
+    },
+    {
+      "index": 286,
+      "filename": "00286.png",
+      "category": "safe_safes",
+      "sha256_16": "0dc2e2ea867c4391",
+      "bytes": 153217
+    },
+    {
+      "index": 287,
+      "filename": "00287.png",
+      "category": "safe_safes",
+      "sha256_16": "d4de5fbffeb4f59f",
+      "bytes": 672820
+    },
+    {
+      "index": 288,
+      "filename": "00288.png",
+      "category": "safe_safes",
+      "sha256_16": "e8156979841e4599",
+      "bytes": 488094
+    },
+    {
+      "index": 289,
+      "filename": "00289.png",
+      "category": "safe_safes",
+      "sha256_16": "78ad4cbb8e6edddc",
+      "bytes": 170151
+    },
+    {
+      "index": 290,
+      "filename": "00290.png",
+      "category": "safe_safes",
+      "sha256_16": "35e597b43106a91b",
+      "bytes": 237211
+    },
+    {
+      "index": 291,
+      "filename": "00291.png",
+      "category": "safe_safes",
+      "sha256_16": "ef326a7ad57055db",
+      "bytes": 363583
+    },
+    {
+      "index": 292,
+      "filename": "00292.png",
+      "category": "safe_safes",
+      "sha256_16": "8bffda74bf7cdf31",
+      "bytes": 581475
+    },
+    {
+      "index": 293,
+      "filename": "00293.png",
+      "category": "safe_safes",
+      "sha256_16": "eb0f0020a3ca0b90",
+      "bytes": 365330
+    },
+    {
+      "index": 294,
+      "filename": "00294.png",
+      "category": "safe_safes",
+      "sha256_16": "08bfa8e0741959d6",
+      "bytes": 348183
+    },
+    {
+      "index": 295,
+      "filename": "00295.png",
+      "category": "safe_safes",
+      "sha256_16": "91450c7e220bb12f",
+      "bytes": 520135
+    },
+    {
+      "index": 296,
+      "filename": "00296.png",
+      "category": "safe_safes",
+      "sha256_16": "3bc501ac093bca76",
+      "bytes": 261725
+    },
+    {
+      "index": 297,
+      "filename": "00297.png",
+      "category": "safe_safes",
+      "sha256_16": "68f35d51d77348e3",
+      "bytes": 260806
+    },
+    {
+      "index": 298,
+      "filename": "00298.png",
+      "category": "safe_safes",
+      "sha256_16": "7c1936aeb130a42b",
+      "bytes": 181122
+    },
+    {
+      "index": 299,
+      "filename": "00299.png",
+      "category": "safe_safes",
+      "sha256_16": "c0b36c50d21ad5ea",
+      "bytes": 430834
+    }
+  ]
+}
